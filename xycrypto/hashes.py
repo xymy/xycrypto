@@ -15,6 +15,12 @@ class Hash(object):
     block_size = 64
     digest_size = 32
 
+    def __new__(cls, *args, **kwargs):
+        if cls is Hash:
+            raise NotImplementedError
+        self = object.__new__(cls)
+        return self
+
     def __init__(self):
         """Initialize the current context."""
 
@@ -182,7 +188,7 @@ class BLAKE2s(Hash):
     block_size = 64
     digest_size = 32
 
-    def __init__(self, *, digest_size=64, key=b'', salt=b'', person=b'',
+    def __init__(self, *, digest_size=32, key=b'', salt=b'', person=b'',
                  fanout=1, depth=1, leaf_size=0,
                  node_offset=0, node_depth=0,
                  inner_size=0, last_node=False):
