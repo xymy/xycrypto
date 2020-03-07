@@ -16,12 +16,18 @@ class Hash(object):
     digest_size = 32
 
     def __init__(self):
+        """Initialize the current context."""
+
         self._ctx = self._cls()
 
     def update(self, data):
+        """Update the current context."""
+
         self._ctx.update(data)
 
     def finalize(self):
+        """Finalize the current context and return the message digest as bytes."""
+
         try:
             finalize_func = getattr(self._ctx, 'digest')
         except AttributeError:
@@ -29,6 +35,8 @@ class Hash(object):
         return finalize_func()
 
     def copy(self):
+        """Copy the current context."""
+
         return self._ctx.copy()
 
     @classmethod
