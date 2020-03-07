@@ -32,6 +32,16 @@ class Hash(object):
         return self._ctx.copy()
 
     @classmethod
+    def hash(cls, data):
+        """Return hash of data from memory."""
+
+        ctx = cls()
+        if isinstance(data, str):
+            data = data.encode('utf-8')
+        ctx.update(data)
+        return ctx.finalize()
+
+    @classmethod
     def hash_fileobj(cls, fileobj, chunk_size=0x100000):
         """Return hash of data from file object."""
 
@@ -68,14 +78,6 @@ class Hash(object):
         if os.path.isdir(path):
             return cls.hash_dir(path)
         return cls.hash_file(path)
-
-    @classmethod
-    def hash(cls, data):
-        """Return hash of data from memory."""
-
-        ctx = cls()
-        ctx.update(data)
-        return ctx.finalize()
 
 
 class MD5(Hash):
