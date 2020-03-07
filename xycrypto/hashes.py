@@ -3,7 +3,8 @@ import hashlib
 import os
 
 __all__ = [
-    'Hash', 'MD5', 'SHA1',
+    'Hash', 'ExtendableHash',
+    'MD5', 'SHA1',
     'SHA224', 'SHA256', 'SHA384', 'SHA512',
     'SHA3_224', 'SHA3_256', 'SHA3_384', 'SHA3_512', 'SHAKE128', 'SHAKE256',
     'BLAKE2b', 'BLAKE2s'
@@ -94,6 +95,16 @@ class Hash(object):
         return cls.hash_file(path)
 
 
+class ExtendableHash(Hash):
+    digest_size = 0
+
+    def __new__(cls, *args, **kwargs):
+        if cls is ExtendableHash:
+            raise NotImplementedError
+        self = object.__new__(cls)
+        return self
+
+
 class MD5(Hash):
     _cls = hashlib.md5
     block_size = 64
@@ -154,47 +165,55 @@ class SHA3_512(Hash):
     digest_size = 64
 
 
-class SHAKE128(Hash):
-    _cls = hashlib.shake_128
+class SHAKE128(ExtendableHash):
     block_size = 168
-    digest_size = 0
+
+    def __init__(self, *, digest_size=16):
+        self._ctx = hashlib.shake_128()
+        self.digest_size = digest_size
+
+    def finalize(self):
+        return self._ctx.digest(self.digest_size)
 
 
-class SHAKE256(Hash):
-    _cls = hashlib.shake_256
+class SHAKE256(ExtendableHash):
     block_size = 136
-    digest_size = 0
+
+    def __init__(self, *, digest_size=32):
+        self._ctx = hashlib.shake_256()
+        self.digest_size = digest_size
+
+    def finalize(self):
+        return self._ctx.digest(self.digest_size)
 
 
-class BLAKE2b(Hash):
-    _cls = hashlib.blake2b
+class BLAKE2b(ExtendableHash):
     block_size = 128
-    digest_size = 64
 
     def __init__(self, *, digest_size=64, key=b'', salt=b'', person=b'',
                  fanout=1, depth=1, leaf_size=0,
                  node_offset=0, node_depth=0,
                  inner_size=0, last_node=False):
-        self._ctx = self._cls(
+        self._ctx = hashlib.blake2b(
             digest_size=digest_size, key=key, salt=salt, person=person,
             fanout=fanout, depth=depth, leaf_size=leaf_size,
             node_offset=node_offset, node_depth=node_depth,
             inner_size=inner_size, last_node=last_node
         )
+        self.digest_size = digest_size
 
 
-class BLAKE2s(Hash):
-    _cls = hashlib.blake2s
+class BLAKE2s(ExtendableHash):
     block_size = 64
-    digest_size = 32
 
     def __init__(self, *, digest_size=32, key=b'', salt=b'', person=b'',
                  fanout=1, depth=1, leaf_size=0,
                  node_offset=0, node_depth=0,
                  inner_size=0, last_node=False):
-        self._ctx = self._cls(
+        self._ctx = hashlib.blake2s(
             digest_size=digest_size, key=key, salt=salt, person=person,
             fanout=fanout, depth=depth, leaf_size=leaf_size,
             node_offset=node_offset, node_depth=node_depth,
             inner_size=inner_size, last_node=last_node
         )
+        self.digest_size = digest_size
