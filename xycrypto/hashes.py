@@ -1,3 +1,4 @@
+import abc
 import functools
 import hashlib
 import os
@@ -11,16 +12,21 @@ __all__ = [
 ]
 
 
-class Hash(object):
-    _cls = hashlib.sha256
-    block_size = 64
-    digest_size = 32
+class Hash(metaclass=abc.ABCMeta):
+    @property
+    @abc.abstractmethod
+    def _cls(self):
+        """The class of hash context."""
 
-    def __new__(cls, *args, **kwargs):
-        if cls is Hash:
-            raise NotImplementedError
-        self = object.__new__(cls)
-        return self
+    @property
+    @abc.abstractmethod
+    def block_size(self):
+        """The block size of hash."""
+
+    @property
+    @abc.abstractmethod
+    def digest_size(self):
+        """The digest size of hash."""
 
     def __init__(self):
         """Initialize the current context."""
@@ -96,13 +102,8 @@ class Hash(object):
 
 
 class ExtendableHash(Hash):
-    digest_size = 0
-
-    def __new__(cls, *args, **kwargs):
-        if cls is ExtendableHash:
-            raise NotImplementedError
-        self = object.__new__(cls)
-        return self
+    _cls = None         # disable abstractproperty
+    digest_size = 0     # 0 if accessed by class
 
 
 class MD5(Hash):
