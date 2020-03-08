@@ -84,13 +84,15 @@ class Hash(metaclass=abc.ABCMeta):
         """Return hash of data from a directory."""
 
         with os.scandir(dirpath) as it:
-            result = itertools.repeat(b'\x00')
+            result = itertools.repeat(0)
             for entry in it:
                 if entry.is_dir():
                     value = cls.hash_dir(entry, **kwargs)
                 else:
                     value = cls.hash_file(entry, **kwargs)
                 result = bytes(x ^ y for x, y in zip(result, value))
+            if not isinstance(result, bytes):
+                raise RuntimeError('empty directory')
             return result
 
     @classmethod
