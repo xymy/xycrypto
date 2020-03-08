@@ -14,6 +14,8 @@ __all__ = [
 
 
 class Hash(metaclass=abc.ABCMeta):
+    """Abstract base class for hash context."""
+
     @property
     @abc.abstractmethod
     def _cls(self):
@@ -28,6 +30,10 @@ class Hash(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def digest_size(self):
         """The digest size of hash."""
+
+    # =================
+    # Context Interface
+    # =================
 
     def __init__(self):
         """Initialize the current context."""
@@ -52,6 +58,10 @@ class Hash(metaclass=abc.ABCMeta):
         """Copy the current context."""
 
         return self._ctx.copy()
+
+    # ==============
+    # Fast Interface
+    # ==============
 
     @classmethod
     def hash(cls, data, **kwargs):
@@ -105,6 +115,8 @@ class Hash(metaclass=abc.ABCMeta):
 
 
 class ExtendableHash(Hash):
+    """Abstract base class for extendable hash context."""
+
     _cls = None         # disable abstractproperty
     digest_size = 0     # 0 if accessed by class
 
