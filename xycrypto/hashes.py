@@ -1,6 +1,7 @@
 import abc
 import functools
 import hashlib
+import itertools
 import os
 
 __all__ = [
@@ -83,7 +84,7 @@ class Hash(metaclass=abc.ABCMeta):
         """Return hash of data from a directory."""
 
         with os.scandir(dirpath) as it:
-            result = b'\x00' * cls.digest_size
+            result = itertools.repeat(b'\x00')
             for entry in it:
                 if entry.is_dir():
                     value = cls.hash_dir(entry)
