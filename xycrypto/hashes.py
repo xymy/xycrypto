@@ -54,52 +54,52 @@ class Hash(metaclass=abc.ABCMeta):
         return self._ctx.copy()
 
     @classmethod
-    def hash(cls, data):
+    def hash(cls, data, **kwargs):
         """Return hash of data from memory."""
 
-        ctx = cls()
+        ctx = cls(**kwargs)
         if isinstance(data, str):
             data = data.encode('utf-8')
         ctx.update(data)
         return ctx.finalize()
 
     @classmethod
-    def hash_fileobj(cls, fileobj, chunk_size=0x100000):
+    def hash_fileobj(cls, fileobj, *, chunk_size=0x100000, **kwargs):
         """Return hash of data from file object."""
 
-        ctx = cls()
+        ctx = cls(**kwargs)
         for chunk in iter(functools.partial(fileobj.read, chunk_size), b''):
             ctx.update(chunk)
         return ctx.finalize()
 
     @classmethod
-    def hash_file(cls, filepath):
+    def hash_file(cls, filepath, **kwargs):
         """Return hash of data from a file."""
 
         with open(filepath, 'rb') as f:
-            return cls.hash_fileobj(f)
+            return cls.hash_fileobj(f, **kwargs)
 
     @classmethod
-    def hash_dir(cls, dirpath):
+    def hash_dir(cls, dirpath, **kwargs):
         """Return hash of data from a directory."""
 
         with os.scandir(dirpath) as it:
             result = itertools.repeat(b'\x00')
             for entry in it:
                 if entry.is_dir():
-                    value = cls.hash_dir(entry)
+                    value = cls.hash_dir(entry, **kwargs)
                 else:
-                    value = cls.hash_file(entry)
+                    value = cls.hash_file(entry, **kwargs)
                 result = bytes(x ^ y for x, y in zip(result, value))
             return result
 
     @classmethod
-    def hash_fs(cls, path):
+    def hash_fs(cls, path, **kwargs):
         """Return hash of data from a filesystem."""
 
         if os.path.isdir(path):
-            return cls.hash_dir(path)
-        return cls.hash_file(path)
+            return cls.hash_dir(path, **kwargs)
+        return cls.hash_file(path, **kwargs)
 
 
 class ExtendableHash(Hash):
