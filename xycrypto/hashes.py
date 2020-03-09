@@ -12,6 +12,8 @@ __all__ = [
     'BLAKE2b', 'BLAKE2s'
 ]
 
+_CHUNK_SIZE = 0x100000
+
 
 class Hash(metaclass=abc.ABCMeta):
     """Abstract base class for hash context."""
@@ -81,10 +83,10 @@ class Hash(metaclass=abc.ABCMeta):
         return ctx.finalize()
 
     @classmethod
-    def hash_fileobj(cls, fileobj, *, chunk_size=0x100000, **kwargs):
+    def hash_fileobj(cls, fileobj, **kwargs):
         """Return hash of data from file object."""
 
-        it = iter(functools.partial(fileobj.read, chunk_size), b'')
+        it = iter(functools.partial(fileobj.read, _CHUNK_SIZE), b'')
         return cls.hash_iter(it, **kwargs)
 
     @classmethod
