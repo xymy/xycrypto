@@ -210,6 +210,10 @@ class SHAKE256(ExtendableHash):
 
 class BLAKE2b(ExtendableHash):
     block_size = 128
+    max_digest_size = 64
+    max_key_size = 64
+    salt_size = 16
+    person_size = 16
 
     def __init__(self, *, digest_size=64, key=b'', salt=b'', person=b'',
                  fanout=1, depth=1, leaf_size=0,
@@ -226,6 +230,10 @@ class BLAKE2b(ExtendableHash):
 
 class BLAKE2s(ExtendableHash):
     block_size = 64
+    max_digest_size = 32
+    max_key_size = 32
+    salt_size = 8
+    person_size = 8
 
     def __init__(self, *, digest_size=32, key=b'', salt=b'', person=b'',
                  fanout=1, depth=1, leaf_size=0,
