@@ -74,13 +74,18 @@ class Hash(metaclass=abc.ABCMeta):
         return ctx.finalize()
 
     @classmethod
+    def hash_iter(cls, iterable, **kwargs):
+        ctx = cls(**kwargs)
+        for chunk in iterable:
+            ctx.update(chunk)
+        return ctx.finalize()
+
+    @classmethod
     def hash_fileobj(cls, fileobj, *, chunk_size=0x100000, **kwargs):
         """Return hash of data from file object."""
 
-        ctx = cls(**kwargs)
-        for chunk in iter(functools.partial(fileobj.read, chunk_size), b''):
-            ctx.update(chunk)
-        return ctx.finalize()
+        it = iter(functools.partial(fileobj.read, chunk_size), b'')
+        return cls.hash_iter(it, **kwargs)
 
     @classmethod
     def hash_file(cls, filepath, **kwargs):
