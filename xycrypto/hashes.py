@@ -23,9 +23,9 @@ class Hash(metaclass=abc.ABCMeta):
     def _cls(self):
         """The class of hash context."""
 
-    # =================
-    # Context Interface
-    # =================
+    # ==================
+    # Context Interfaces
+    # ==================
 
     def __init__(self):
         """Initialize the current context."""
@@ -51,9 +51,9 @@ class Hash(metaclass=abc.ABCMeta):
 
         return self._ctx.copy()
 
-    # ==============
-    # Fast Interface
-    # ==============
+    # ===============
+    # Fast Interfaces
+    # ===============
 
     @classmethod
     def hash(cls, data, **kwargs):
@@ -67,6 +67,8 @@ class Hash(metaclass=abc.ABCMeta):
 
     @classmethod
     def hash_iter(cls, iterable, **kwargs):
+        """Return hash of data from iterable of bytes."""
+
         ctx = cls(**kwargs)
         for chunk in iterable:
             ctx.update(chunk)

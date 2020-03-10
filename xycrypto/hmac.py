@@ -13,9 +13,9 @@ _TRANS_5C = bytes((x ^ 0x5C) for x in range(256))
 class HMAC(object):
     """Hash-based message authentication codes."""
 
-    # =================
-    # Context Interface
-    # =================
+    # ==================
+    # Context Interfaces
+    # ==================
 
     def __init__(self, hash_cls, key):
         """Initialize the current context."""
@@ -61,9 +61,9 @@ class HMAC(object):
         other.o_ctx = self.o_ctx.copy()
         return other
 
-    # ==============
-    # Fast Interface
-    # ==============
+    # ===============
+    # Fast Interfaces
+    # ===============
 
     @classmethod
     def hash(cls, hash_cls, key, data, **kwargs):
@@ -77,6 +77,8 @@ class HMAC(object):
 
     @classmethod
     def hash_iter(cls, hash_cls, key, iterable, **kwargs):
+        """Return hash of data from iterable of bytes."""
+
         ctx = cls(hash_cls, key, **kwargs)
         for chunk in iterable:
             ctx.update(chunk)
