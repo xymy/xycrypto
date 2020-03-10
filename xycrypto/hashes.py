@@ -23,16 +23,6 @@ class Hash(metaclass=abc.ABCMeta):
     def _cls(self):
         """The class of hash context."""
 
-    @property
-    @abc.abstractmethod
-    def block_size(self):
-        """The block size of hash."""
-
-    @property
-    @abc.abstractmethod
-    def digest_size(self):
-        """The digest size of hash."""
-
     # =================
     # Context Interface
     # =================
@@ -124,8 +114,9 @@ class Hash(metaclass=abc.ABCMeta):
 class ExtendableHash(Hash):
     """Abstract base class for extendable hash context."""
 
-    _cls = None         # disable abstractproperty
-    digest_size = 0     # 0 if accessed by class
+    @abc.abstractmethod
+    def __init__(self):
+        """Initialize the current context."""
 
 
 class MD5(Hash):
@@ -189,10 +180,11 @@ class SHA3_512(Hash):
 
 
 class SHAKE128(ExtendableHash):
+    _cls = hashlib.shake_128
     block_size = 168
 
     def __init__(self, *, digest_size=16):
-        self._ctx = hashlib.shake_128()
+        self._ctx = self._cls()
         self.digest_size = digest_size
 
     def finalize(self):
@@ -200,10 +192,11 @@ class SHAKE128(ExtendableHash):
 
 
 class SHAKE256(ExtendableHash):
+    _cls = hashlib.shake_256
     block_size = 136
 
     def __init__(self, *, digest_size=32):
-        self._ctx = hashlib.shake_256()
+        self._ctx = self._cls()
         self.digest_size = digest_size
 
     def finalize(self):
@@ -211,6 +204,7 @@ class SHAKE256(ExtendableHash):
 
 
 class BLAKE2b(ExtendableHash):
+    _cls = hashlib.blake2b
     block_size = 128
     max_digest_size = 64
     max_key_size = 64
@@ -221,7 +215,7 @@ class BLAKE2b(ExtendableHash):
                  fanout=1, depth=1, leaf_size=0,
                  node_offset=0, node_depth=0,
                  inner_size=0, last_node=False):
-        self._ctx = hashlib.blake2b(
+        self._ctx = self._cls(
             digest_size=digest_size, key=key, salt=salt, person=person,
             fanout=fanout, depth=depth, leaf_size=leaf_size,
             node_offset=node_offset, node_depth=node_depth,
@@ -231,6 +225,7 @@ class BLAKE2b(ExtendableHash):
 
 
 class BLAKE2s(ExtendableHash):
+    _cls = hashlib.blake2s
     block_size = 64
     max_digest_size = 32
     max_key_size = 32
@@ -241,7 +236,7 @@ class BLAKE2s(ExtendableHash):
                  fanout=1, depth=1, leaf_size=0,
                  node_offset=0, node_depth=0,
                  inner_size=0, last_node=False):
-        self._ctx = hashlib.blake2s(
+        self._ctx = self._cls(
             digest_size=digest_size, key=key, salt=salt, person=person,
             fanout=fanout, depth=depth, leaf_size=leaf_size,
             node_offset=node_offset, node_depth=node_depth,
