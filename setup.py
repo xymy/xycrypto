@@ -20,7 +20,7 @@ classifiers = [
 setup(
     name='xycrypto',
     version=__version__,
-    description='A friendly cryptography library.',
+    description='A friendly cryptographic primitives library.',
     long_description=readme,
     long_description_content_type='text/markdown',
     author=__author__,
