@@ -1,7 +1,7 @@
 import abc
 import os
 
-__all__ = ['Padding', 'PKCS7', 'ANSIX923', 'ISO10126']
+__all__ = ['PKCS7', 'ANSIX923', 'ISO10126']
 
 
 class _CommonPadder(object):
@@ -90,13 +90,13 @@ class Padding(metaclass=abc.ABCMeta):
 # ==============
 
 
-class PKCS7Padder(_CommonPadder):
+class _PKCS7Padder(_CommonPadder):
     @staticmethod
     def _padding(padded_size):
         return padded_size.to_bytes(1, 'big') * padded_size
 
 
-class PKCS7Unpadder(_CommonUnpadder):
+class _PKCS7Unpadder(_CommonUnpadder):
     @staticmethod
     def _check(buffer, padded_size):
         for i in range(2, padded_size + 1):
@@ -105,8 +105,8 @@ class PKCS7Unpadder(_CommonUnpadder):
 
 
 class PKCS7(Padding):
-    _padder_cls = PKCS7Padder
-    _unpadder_cls = PKCS7Unpadder
+    _padder_cls = _PKCS7Padder
+    _unpadder_cls = _PKCS7Unpadder
 
 
 # ==================
@@ -114,13 +114,13 @@ class PKCS7(Padding):
 # ==================
 
 
-class ANSIX923Padder(_CommonPadder):
+class _ANSIX923Padder(_CommonPadder):
     @staticmethod
     def _padding(padded_size):
         return b'\x00' * (padded_size - 1) + padded_size.to_bytes(1, 'big')
 
 
-class ANSIX923Unpadder(_CommonUnpadder):
+class _ANSIX923Unpadder(_CommonUnpadder):
     @staticmethod
     def _check(buffer, padded_size):
         for i in range(2, padded_size + 1):
@@ -129,8 +129,8 @@ class ANSIX923Unpadder(_CommonUnpadder):
 
 
 class ANSIX923(Padding):
-    _padder_cls = ANSIX923Padder
-    _unpadder_cls = ANSIX923Unpadder
+    _padder_cls = _ANSIX923Padder
+    _unpadder_cls = _ANSIX923Unpadder
 
 
 # =================
@@ -138,18 +138,18 @@ class ANSIX923(Padding):
 # =================
 
 
-class ISO10126Padder(_CommonPadder):
+class _ISO10126Padder(_CommonPadder):
     @staticmethod
     def _padding(padded_size):
         return os.urandom(padded_size - 1) + padded_size.to_bytes(1, 'big')
 
 
-class ISO10126Unpadder(_CommonUnpadder):
+class _ISO10126Unpadder(_CommonUnpadder):
     @staticmethod
     def _check(buffer, padded_size):
         pass
 
 
 class ISO10126(Padding):
-    _padder_cls = ISO10126Padder
-    _unpadder_cls = ISO10126Unpadder
+    _padder_cls = _ISO10126Padder
+    _unpadder_cls = _ISO10126Unpadder

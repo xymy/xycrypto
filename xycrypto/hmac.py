@@ -1,9 +1,9 @@
 import functools
-import hmac
 import itertools
 import os
+from hmac import compare_digest
 
-__all__ = ['HMAC']
+__all__ = ['HMAC', 'compare_digest']
 
 _CHUNK_SIZE = 0x100000
 _TRANS_36 = bytes((x ^ 0x36) for x in range(256))
@@ -49,7 +49,7 @@ class HMAC(object):
     def verify(self, signature):
         """Finalize the current context and securely compare digest to signature."""
 
-        return hmac.compare_digest(self.finalize(), signature)
+        return compare_digest(self.finalize(), signature)
 
     def copy(self):
         """Copy the current context."""
