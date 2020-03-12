@@ -57,7 +57,7 @@ class Hash(metaclass=abc.ABCMeta):
 
     @classmethod
     def hash(cls, data, **kwargs):
-        """Return hash of data from memory."""
+        """Return hash of data from byte string or unicode string."""
 
         ctx = cls(**kwargs)
         if isinstance(data, str):
@@ -83,14 +83,14 @@ class Hash(metaclass=abc.ABCMeta):
 
     @classmethod
     def hash_file(cls, filepath, **kwargs):
-        """Return hash of data from a file."""
+        """Return hash of data from file."""
 
         with open(filepath, 'rb') as f:
             return cls.hash_fileobj(f, **kwargs)
 
     @classmethod
     def hash_dir(cls, dirpath, **kwargs):
-        """Return hash of data from a directory."""
+        """Return hash of data from directory."""
 
         with os.scandir(dirpath) as it:
             result = itertools.repeat(0)
@@ -106,7 +106,7 @@ class Hash(metaclass=abc.ABCMeta):
 
     @classmethod
     def hash_fs(cls, path, **kwargs):
-        """Return hash of data from a filesystem."""
+        """Return hash of data from filesystems."""
 
         if os.path.isdir(path):
             return cls.hash_dir(path, **kwargs)

@@ -67,7 +67,7 @@ class HMAC(object):
 
     @classmethod
     def hash(cls, hash_cls, key, data, **kwargs):
-        """Return hash of data from memory."""
+        """Return hash of data from byte string or unicode string."""
 
         ctx = cls(hash_cls, key, **kwargs)
         if isinstance(data, str):
@@ -93,14 +93,14 @@ class HMAC(object):
 
     @classmethod
     def hash_file(cls, hash_cls, key, filepath, **kwargs):
-        """Return hash of data from a file."""
+        """Return hash of data from file."""
 
         with open(filepath, 'rb') as f:
             return cls.hash_fileobj(hash_cls, key, f, **kwargs)
 
     @classmethod
     def hash_dir(cls, hash_cls, key, dirpath, **kwargs):
-        """Return hash of data from a directory."""
+        """Return hash of data from directory."""
 
         with os.scandir(dirpath) as it:
             result = itertools.repeat(0)
@@ -116,7 +116,7 @@ class HMAC(object):
 
     @classmethod
     def hash_fs(cls, hash_cls, key, path, **kwargs):
-        """Return hash of data from a filesystem."""
+        """Return hash of data from filesystems."""
 
         if os.path.isdir(path):
             return cls.hash_dir(hash_cls, key, path, **kwargs)
