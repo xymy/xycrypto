@@ -3,21 +3,23 @@ import os
 
 __all__ = ['Padding', 'PKCS7', 'ANSIX923', 'ISO10126']
 
-# ==============
-# Common Padding
-# ==============
-
 
 class _CommonPadder(object):
     def __init__(self, block_size):
+        """Initialize the current context."""
+
         self.block_size = block_size
         self._size = 0
 
     def update(self, data):
+        """Update the current context."""
+
         self._size += len(data)
         return data
 
     def finalize(self):
+        """Finalize the current context and return the rest of the data."""
+
         padded_size = self.block_size - (self._size % self.block_size)
         return self._padding(padded_size)
 
@@ -28,10 +30,14 @@ class _CommonPadder(object):
 
 class _CommonUnpadder(object):
     def __init__(self, block_size):
+        """Initialize the current context."""
+
         self.block_size = block_size
         self._buf = b''
 
     def update(self, data):
+        """Update the current context."""
+
         self._buf += data
         remaining_size = (len(self._buf) % self.block_size) or self.block_size
         result = self._buf[:-remaining_size]
@@ -39,6 +45,8 @@ class _CommonUnpadder(object):
         return result
 
     def finalize(self):
+        """Finalize the current context and return the rest of the data."""
+
         if len(self._buf) != self.block_size:
             raise ValueError('invalid padding')
         padded_size = self._buf[-1]
@@ -67,9 +75,13 @@ class Padding(metaclass=abc.ABCMeta):
         self.block_size = block_size
 
     def padder(self):
+        """Return the padder context."""
+
         return self._padder_cls(self.block_size)
 
     def unpadder(self):
+        """Return the unpadder context."""
+
         return self._unpadder_cls(self.block_size)
 
 
