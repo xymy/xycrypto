@@ -84,6 +84,24 @@ class Padding(metaclass=abc.ABCMeta):
 
         return self._unpadder_cls(self.block_size)
 
+    class _PaddingWrapper(object):
+        def __init__(self, padded_ctx, padding_ctx):
+            self.padded_ctx = padded_ctx
+            self.padding_ctx = padding_ctx
+
+        def update(self, data):
+            return self.padded_ctx.update(self.padding_ctx.update(data))
+
+        def finalize(self):
+            temp = self.padded_ctx.update(self.padding_ctx.finalize())
+            return temp + self.padded_ctx.finalize()
+
+    def wrap_padder(self, encryptor_ctx):
+        return self._PaddingWrapper(encryptor_ctx, self.padder())
+
+    def wrap_unpadder(self, decryptor_ctx):
+        return self._PaddingWrapper(self.unpadder(), decryptor_ctx)
+
 
 # ==============
 # PKCS#7 Padding
