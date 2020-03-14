@@ -72,6 +72,13 @@ class Padding(metaclass=abc.ABCMeta):
         """The class of unpadder context."""
 
     def __init__(self, block_size):
+        """Prepare the context."""
+
+        if not isinstance(block_size, int):
+            raise TypeError('block_size must be int, got {}'.format(type(block_size).__name__))
+        if block_size < 1 or block_size > 255:
+            raise ValueError('block_size must be in [1, 255], got {}'.format(block_size))
+
         self.block_size = block_size
 
     def padder(self):
@@ -165,7 +172,7 @@ class _ISO10126Padder(_CommonPadder):
 class _ISO10126Unpadder(_CommonUnpadder):
     @staticmethod
     def _check(buffer, padded_size):
-        pass
+        pass    # no need to check
 
 
 class ISO10126(Padding):
