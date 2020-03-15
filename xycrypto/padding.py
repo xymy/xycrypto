@@ -178,3 +178,25 @@ class _ISO10126Unpadder(_CommonUnpadder):
 class ISO10126(Padding):
     _padder_cls = _ISO10126Padder
     _unpadder_cls = _ISO10126Unpadder
+
+
+# ==============
+# Lookup Padding
+# ==============
+
+
+_PADDING_TABLE = {
+    'PKCS7': PKCS7,
+    'ANSIX923': ANSIX923,
+    'ISO10126': ISO10126
+}
+
+
+def _lookup_padding(padding):
+    if isinstance(padding, str):
+        padding = _PADDING_TABLE.get(padding, None)
+        if padding is not None:
+            return padding
+    elif isinstance(padding, Padding):
+        return padding
+    raise ValueError('padding must be in {}'.format(set(_PADDING_TABLE.keys())))
