@@ -103,10 +103,10 @@ class Padding(metaclass=abc.ABCMeta):
             temp = self.padded_ctx.update(self.padding_ctx.finalize())
             return temp + self.padded_ctx.finalize()
 
-    def wrap_padder(self, encryptor_ctx):
+    def wrap_encryptor(self, encryptor_ctx):
         return self._PaddingWrapper(encryptor_ctx, self.padder())
 
-    def wrap_unpadder(self, decryptor_ctx):
+    def wrap_decryptor(self, decryptor_ctx):
         return self._PaddingWrapper(self.unpadder(), decryptor_ctx)
 
 
