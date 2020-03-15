@@ -194,7 +194,7 @@ _PADDING_TABLE = {
 
 def _lookup_padding(padding):
     if isinstance(padding, str):
-        padding = _PADDING_TABLE.get(padding, None)
+        padding = _PADDING_TABLE.get(padding.upper(), None)
         if padding is not None:
             return padding
     elif isinstance(padding, Padding):
