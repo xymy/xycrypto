@@ -1,5 +1,7 @@
 import abc
 
+from xycrypto.padding import _lookup_padding
+
 from . import _lib
 
 
@@ -21,6 +23,7 @@ class BlockCipher(Cipher):
         if padding is None:
             self._padding = None
         else:
+            padding = _lookup_padding(padding)
             self._padding = padding(self.block_size)
 
     def encryptor(self):
