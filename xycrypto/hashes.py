@@ -38,11 +38,7 @@ class Hash(metaclass=abc.ABCMeta):
     def finalize(self):
         """Finalize the current context and return the message digest as bytes."""
 
-        try:
-            finalize_func = getattr(self._ctx, 'digest')
-        except AttributeError:
-            finalize_func = getattr(self._ctx, 'finalize')
-        return finalize_func()
+        return self._ctx.digest()   # note the interface of stdlib
 
     def copy(self):
         """Copy the current context."""
