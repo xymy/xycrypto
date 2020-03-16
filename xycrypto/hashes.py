@@ -1,7 +1,6 @@
 import abc
 import functools
 import hashlib
-import itertools
 import os
 
 __all__ = [
@@ -86,17 +85,23 @@ class Hash(metaclass=abc.ABCMeta):
     def hash_dir(cls, dirpath, **kwargs):
         """Return hash of data from directory."""
 
-        with os.scandir(dirpath) as it:
-            result = itertools.repeat(0)
-            for entry in it:
-                if entry.is_dir():
-                    value = cls.hash_dir(entry, **kwargs)
-                else:
-                    value = cls.hash_file(entry, **kwargs)
-                result = bytes(x ^ y for x, y in zip(result, value))
-            if not isinstance(result, bytes):
-                raise RuntimeError('empty directory')
+        try:
+            digest_size = getattr(cls, 'digest_size')
+        except AttributeError:
+            digest_size = getattr(cls(**kwargs), 'digest_size')
+
+        def _hash_dir(cls, dirpath, **kwargs):
+            result = b'\x00' * digest_size
+            with os.scandir(dirpath) as it:
+                for entry in it:
+                    if entry.is_dir():
+                        value = cls.hash_dir(entry, **kwargs)
+                    else:
+                        value = cls.hash_file(entry, **kwargs)
+                    result = bytes(x ^ y for x, y in zip(result, value))
             return result
+
+        return _hash_dir(cls, dirpath, **kwargs)
 
     @classmethod
     def hash_fs(cls, path, **kwargs):

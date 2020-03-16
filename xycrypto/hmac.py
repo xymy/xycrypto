@@ -1,5 +1,4 @@
 import functools
-import itertools
 import os
 from hmac import compare_digest
 
@@ -102,17 +101,20 @@ class HMAC(object):
     def hash_dir(cls, hash_cls, key, dirpath, **kwargs):
         """Return hash of data from directory."""
 
-        with os.scandir(dirpath) as it:
-            result = itertools.repeat(0)
-            for entry in it:
-                if entry.is_dir():
-                    value = cls.hash_dir(hash_cls, key, entry, **kwargs)
-                else:
-                    value = cls.hash_file(hash_cls, key, entry, **kwargs)
-                result = bytes(x ^ y for x, y in zip(result, value))
-            if not isinstance(result, bytes):
-                raise RuntimeError('empty directory')
+        digest_size = getattr(cls(hash_cls, key, **kwargs), 'digest_size')
+
+        def _hash_dir(cls, hash_cls, key, dirpath, **kwargs):
+            result = b'\x00' * digest_size
+            with os.scandir(dirpath) as it:
+                for entry in it:
+                    if entry.is_dir():
+                        value = cls.hash_dir(hash_cls, key, entry, **kwargs)
+                    else:
+                        value = cls.hash_file(hash_cls, key, entry, **kwargs)
+                    result = bytes(x ^ y for x, y in zip(result, value))
             return result
+
+        return _hash_dir(cls, hash_cls, key, dirpath, **kwargs)
 
     @classmethod
     def hash_fs(cls, hash_cls, key, path, **kwargs):
