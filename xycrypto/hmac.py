@@ -20,10 +20,10 @@ class HMAC(object):
     def __init__(self, hash_cls, key):
         """Initialize the current context."""
 
-        self.i_ctx = hash_cls()
-        self.o_ctx = hash_cls()
-        self.block_size = self.o_ctx.block_size
-        self.digest_size = self.o_ctx.digest_size
+        self._i_ctx = hash_cls()
+        self._o_ctx = hash_cls()
+        self.block_size = self._o_ctx.block_size
+        self.digest_size = self._o_ctx.digest_size
 
         if len(key) > self.block_size:
             ctx = hash_cls()
@@ -31,19 +31,19 @@ class HMAC(object):
             key = ctx.finalize()
         key = key.ljust(self.block_size, b'\0')
 
-        self.i_ctx.update(key.translate(_TRANS_36))
-        self.o_ctx.update(key.translate(_TRANS_5C))
+        self._i_ctx.update(key.translate(_TRANS_36))
+        self._o_ctx.update(key.translate(_TRANS_5C))
 
     def update(self, data):
         """Update the current context."""
 
-        self.i_ctx.update(data)
+        self._i_ctx.update(data)
 
     def finalize(self):
         """Finalize the current context and return the message digest as bytes."""
 
-        ctx = self.o_ctx.copy()
-        ctx.update(self.i_ctx.finalize())
+        ctx = self._o_ctx.copy()
+        ctx.update(self._i_ctx.finalize())
         return ctx.finalize()
 
     def verify(self, signature):
@@ -55,10 +55,10 @@ class HMAC(object):
         """Copy the current context."""
 
         other = type(self).__new__(type(self))
+        other._i_ctx = self._i_ctx.copy()
+        other._o_ctx = self._o_ctx.copy()
         other.block_size = self.block_size
         other.digest_size = self.digest_size
-        other.i_ctx = self.i_ctx.copy()
-        other.o_ctx = self.o_ctx.copy()
         return other
 
     # ===============
