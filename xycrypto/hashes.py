@@ -52,9 +52,9 @@ class Hash(metaclass=abc.ABCMeta):
     def hash(cls, data, **kwargs):
         """Return hash of data from byte string or unicode string."""
 
-        ctx = cls(**kwargs)
         if isinstance(data, str):
             data = data.encode('utf-8')
+        ctx = cls(**kwargs)
         ctx.update(data)
         return ctx.finalize()
 
