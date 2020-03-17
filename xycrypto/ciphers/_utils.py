@@ -20,3 +20,10 @@ def _determine_decryptor(cipher, padding):
     if padding is None:
         return decryptor
     return padding.wrap_decryptor(decryptor)
+
+
+def _make_X(cipher_attrs):
+    def _X(cipher_base):
+        name = cipher_base.__name__ + '_' + cipher_attrs['name']
+        return type(name, (cipher_base,), cipher_attrs)
+    return _X
