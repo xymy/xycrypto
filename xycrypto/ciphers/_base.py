@@ -80,3 +80,49 @@ class BlockCipherCBC(BlockCipher):
     def decrypt(cls, key, data, *, iv, padding='PKCS7'):
         cipher = cls(key, iv=iv, padding=padding)
         return _utils._perform_decryption(cipher, data)
+
+
+class BlockCipherOFB(BlockCipher):
+    """Abstract base class for block cipher in OFB mode."""
+
+    def __init__(self, key, *, iv):
+        self._cipher = _lib.Cipher(self._algorithm(key), _lib.OFB(iv), _lib.backend)
+
+    def encryptor(self):
+        return self._cipher.encryptor()
+
+    def decryptor(self):
+        return self._cipher.decryptor()
+
+    @classmethod
+    def encrypt(cls, key, data, *, iv):
+        cipher = cls(key, iv=iv)
+        return _utils._perform_encryption(cipher, data)
+
+    @classmethod
+    def decrypt(cls, key, data, *, iv):
+        cipher = cls(key, iv=iv)
+        return _utils._perform_decryption(cipher, data)
+
+
+class BlockCipherCFB(BlockCipher):
+    """Abstract base class for block cipher in CFB mode."""
+
+    def __init__(self, key, *, iv):
+        self._cipher = _lib.Cipher(self._algorithm(key), _lib.CFB(iv), _lib.backend)
+
+    def encryptor(self):
+        return self._cipher.encryptor()
+
+    def decryptor(self):
+        return self._cipher.decryptor()
+
+    @classmethod
+    def encrypt(cls, key, data, *, iv):
+        cipher = cls(key, iv=iv)
+        return _utils._perform_encryption(cipher, data)
+
+    @classmethod
+    def decrypt(cls, key, data, *, iv):
+        cipher = cls(key, iv=iv)
+        return _utils._perform_decryption(cipher, data)

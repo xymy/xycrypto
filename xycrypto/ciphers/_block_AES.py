@@ -15,3 +15,11 @@ class AES_ECB(_X(_base.BlockCipherECB)):
 
 class AES_CBC(_X(_base.BlockCipherCBC)):
     pass
+
+
+class AES_OFB(_X(_base.BlockCipherOFB)):
+    pass
+
+
+class AES_CFB(_X(_base.BlockCipherCFB)):
+    pass
