@@ -10,7 +10,7 @@ _TRANS_5C = bytes((x ^ 0x5C) for x in range(256))
 
 
 class HMAC(object):
-    """Hash-based message authentication codes."""
+    """Hash-based Message Authentication Code."""
 
     # ==================
     # Context Interfaces
