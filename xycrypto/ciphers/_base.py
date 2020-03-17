@@ -48,6 +48,16 @@ class BlockCipherECB(BlockCipher):
     def decryptor(self):
         return _utils._determine_decryptor(self._cipher, self._padding)
 
+    @classmethod
+    def encrypt(cls, key, data, padding='PKCS7'):
+        cipher = cls(key, padding=padding)
+        return _utils._perform_encryption(cipher, data)
+
+    @classmethod
+    def decrypt(cls, key, data, padding='PKCS7'):
+        cipher = cls(key, padding=padding)
+        return _utils._perform_decryption(cipher, data)
+
 
 class BlockCipherCBC(BlockCipher):
     """Abstract base class for block cipher in CBC mode."""
@@ -61,3 +71,13 @@ class BlockCipherCBC(BlockCipher):
 
     def decryptor(self):
         return _utils._determine_decryptor(self._cipher, self._padding)
+
+    @classmethod
+    def encrypt(cls, key, data, iv, padding='PKCS7'):
+        cipher = cls(key, iv=iv, padding=padding)
+        return _utils._perform_encryption(cipher, data)
+
+    @classmethod
+    def decrypt(cls, key, data, iv, padding='PKCS7'):
+        cipher = cls(key, iv=iv, padding=padding)
+        return _utils._perform_decryption(cipher, data)
