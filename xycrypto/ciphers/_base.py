@@ -1,7 +1,6 @@
 import abc
 
-from . import _lib
-from . import _utils
+from . import _lib, _utils
 
 
 class Cipher(metaclass=abc.ABCMeta):
@@ -38,7 +37,7 @@ class BlockCipher(Cipher):
 class BlockCipherECB(BlockCipher):
     """Abstract base class for block cipher in ECB mode."""
 
-    def __init__(self, key, padding='PKCS7'):
+    def __init__(self, key, *, padding='PKCS7'):
         self._cipher = _lib.Cipher(self._algorithm(key), _lib.ECB(), _lib.backend)
         self._padding = _utils._determine_padding(padding, self.block_size)
 
@@ -49,12 +48,12 @@ class BlockCipherECB(BlockCipher):
         return _utils._determine_decryptor(self._cipher, self._padding)
 
     @classmethod
-    def encrypt(cls, key, data, padding='PKCS7'):
+    def encrypt(cls, key, data, *, padding='PKCS7'):
         cipher = cls(key, padding=padding)
         return _utils._perform_encryption(cipher, data)
 
     @classmethod
-    def decrypt(cls, key, data, padding='PKCS7'):
+    def decrypt(cls, key, data, *, padding='PKCS7'):
         cipher = cls(key, padding=padding)
         return _utils._perform_decryption(cipher, data)
 
@@ -62,7 +61,7 @@ class BlockCipherECB(BlockCipher):
 class BlockCipherCBC(BlockCipher):
     """Abstract base class for block cipher in CBC mode."""
 
-    def __init__(self, key, iv, padding='PKCS7'):
+    def __init__(self, key, *, iv, padding='PKCS7'):
         self._cipher = _lib.Cipher(self._algorithm(key), _lib.CBC(iv), _lib.backend)
         self._padding = _utils._determine_padding(padding, self.block_size)
 
@@ -73,11 +72,11 @@ class BlockCipherCBC(BlockCipher):
         return _utils._determine_decryptor(self._cipher, self._padding)
 
     @classmethod
-    def encrypt(cls, key, data, iv, padding='PKCS7'):
+    def encrypt(cls, key, data, *, iv, padding='PKCS7'):
         cipher = cls(key, iv=iv, padding=padding)
         return _utils._perform_encryption(cipher, data)
 
     @classmethod
-    def decrypt(cls, key, data, iv, padding='PKCS7'):
+    def decrypt(cls, key, data, *, iv, padding='PKCS7'):
         cipher = cls(key, iv=iv, padding=padding)
         return _utils._perform_decryption(cipher, data)
