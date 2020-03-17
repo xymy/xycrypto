@@ -20,14 +20,21 @@ classifiers = [
 setup(
     name='xycrypto',
     version=__version__,
+    license='MIT',
+
     description='A friendly cryptographic primitives library.',
     long_description=readme,
     long_description_content_type='text/markdown',
+
     author=__author__,
     author_email='thyfan@163.com',
+    url='https://github.com/xymy/xycrypto',
+
     classifiers=classifiers,
+
     packages=find_packages(),
     include_package_data=True,
+
     install_requires=[
         'cryptography>=2.8',
     ],
