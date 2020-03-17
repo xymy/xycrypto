@@ -21,10 +21,10 @@ class _CommonPadder(object):
         """Finalize the current context and return the rest of the data."""
 
         padded_size = self.block_size - (self._size % self.block_size)
-        return self._padding(padded_size)
+        return self._pad(padded_size)
 
     @staticmethod
-    def _padding(padded_size):
+    def _pad(padded_size):
         raise NotImplementedError
 
 
@@ -117,7 +117,7 @@ class Padding(metaclass=abc.ABCMeta):
 
 class _PKCS7Padder(_CommonPadder):
     @staticmethod
-    def _padding(padded_size):
+    def _pad(padded_size):
         return padded_size.to_bytes(1, 'big') * padded_size
 
 
@@ -141,7 +141,7 @@ class PKCS7(Padding):
 
 class _ANSIX923Padder(_CommonPadder):
     @staticmethod
-    def _padding(padded_size):
+    def _pad(padded_size):
         return b'\x00' * (padded_size - 1) + padded_size.to_bytes(1, 'big')
 
 
@@ -165,7 +165,7 @@ class ANSIX923(Padding):
 
 class _ISO10126Padder(_CommonPadder):
     @staticmethod
-    def _padding(padded_size):
+    def _pad(padded_size):
         return os.urandom(padded_size - 1) + padded_size.to_bytes(1, 'big')
 
 
