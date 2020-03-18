@@ -23,3 +23,7 @@ class AES_OFB(_X(_base.BlockCipherOFB)):
 
 class AES_CFB(_X(_base.BlockCipherCFB)):
     pass
+
+
+class AES_CTR(_X(_base.BlockCipherCTR)):
+    pass

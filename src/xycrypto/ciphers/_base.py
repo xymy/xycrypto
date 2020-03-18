@@ -82,6 +82,7 @@ class BlockCipherCBC(BlockCipher):
         return _utils._perform_decryption(cipher, data)
 
 
+@StreamCipher.register
 class BlockCipherOFB(BlockCipher):
     """Abstract base class for block cipher in OFB mode."""
 
@@ -105,6 +106,7 @@ class BlockCipherOFB(BlockCipher):
         return _utils._perform_decryption(cipher, data)
 
 
+@StreamCipher.register
 class BlockCipherCFB(BlockCipher):
     """Abstract base class for block cipher in CFB mode."""
 
@@ -125,4 +127,28 @@ class BlockCipherCFB(BlockCipher):
     @classmethod
     def decrypt(cls, key, data, *, iv):
         cipher = cls(key, iv=iv)
+        return _utils._perform_decryption(cipher, data)
+
+
+@StreamCipher.register
+class BlockCipherCTR(BlockCipher):
+    """Abstract base class for block cipher in CTR mode."""
+
+    def __init__(self, key, *, nonce):
+        self._cipher = _lib.Cipher(self._algorithm(key), _lib.CTR(nonce), _lib.backend)
+
+    def encryptor(self):
+        return self._cipher.encryptor()
+
+    def decryptor(self):
+        return self._cipher.decryptor()
+
+    @classmethod
+    def encrypt(cls, key, data, *, nonce):
+        cipher = cls(key, nonce=nonce)
+        return _utils._perform_encryption(cipher, data)
+
+    @classmethod
+    def decrypt(cls, key, data, *, nonce):
+        cipher = cls(key, nonce=nonce)
         return _utils._perform_decryption(cipher, data)

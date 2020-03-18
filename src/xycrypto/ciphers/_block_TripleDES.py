@@ -23,3 +23,7 @@ class TripleDES_OFB(_X(_base.BlockCipherOFB)):
 
 class TripleDES_CFB(_X(_base.BlockCipherCFB)):
     pass
+
+
+class TripleDES_CTR(_X(_base.BlockCipherCTR)):
+    pass

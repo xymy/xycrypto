@@ -4,7 +4,7 @@ from cryptography.hazmat.primitives.ciphers.algorithms import (     # NOQA; isor
     AES, TripleDES
 )
 from cryptography.hazmat.primitives.ciphers.modes import (          # NOQA; isort:skip
-    ECB, CBC, OFB, CFB
+    ECB, CBC, OFB, CFB, CTR
 )
 
 backend = default_backend()
