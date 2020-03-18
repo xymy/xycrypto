@@ -11,6 +11,24 @@ class Cipher(metaclass=abc.ABCMeta):
     def _algorithm(self):
         """The algorithm of cipher."""
 
+    @abc.abstractmethod
+    def encryptor(self):
+        """Return the encryptor context."""
+
+    @abc.abstractmethod
+    def decryptor(self):
+        """Return the decryptor context."""
+
+    def encrypt(self, data):
+        encryptor = self.encryptor()
+        temp = encryptor.update(data)
+        return temp + encryptor.finalize()
+
+    def decrypt(self, data):
+        decryptor = self.decryptor()
+        temp = decryptor.update(data)
+        return temp + decryptor.finalize()
+
 
 class StreamCipher(Cipher):
     """Abstract base class for stream cipher."""
@@ -47,16 +65,6 @@ class BlockCipherECB(BlockCipher):
     def decryptor(self):
         return _utils._determine_decryptor(self._cipher, self._padding)
 
-    @classmethod
-    def encrypt(cls, key, data, *, padding='PKCS7'):
-        cipher = cls(key, padding=padding)
-        return _utils._perform_encryption(cipher, data)
-
-    @classmethod
-    def decrypt(cls, key, data, *, padding='PKCS7'):
-        cipher = cls(key, padding=padding)
-        return _utils._perform_decryption(cipher, data)
-
 
 class BlockCipherCBC(BlockCipher):
     """Abstract base class for block cipher in CBC mode."""
@@ -70,16 +78,6 @@ class BlockCipherCBC(BlockCipher):
 
     def decryptor(self):
         return _utils._determine_decryptor(self._cipher, self._padding)
-
-    @classmethod
-    def encrypt(cls, key, data, *, iv, padding='PKCS7'):
-        cipher = cls(key, iv=iv, padding=padding)
-        return _utils._perform_encryption(cipher, data)
-
-    @classmethod
-    def decrypt(cls, key, data, *, iv, padding='PKCS7'):
-        cipher = cls(key, iv=iv, padding=padding)
-        return _utils._perform_decryption(cipher, data)
 
 
 @StreamCipher.register
@@ -95,16 +93,6 @@ class BlockCipherOFB(BlockCipher):
     def decryptor(self):
         return self._cipher.decryptor()
 
-    @classmethod
-    def encrypt(cls, key, data, *, iv):
-        cipher = cls(key, iv=iv)
-        return _utils._perform_encryption(cipher, data)
-
-    @classmethod
-    def decrypt(cls, key, data, *, iv):
-        cipher = cls(key, iv=iv)
-        return _utils._perform_decryption(cipher, data)
-
 
 @StreamCipher.register
 class BlockCipherCFB(BlockCipher):
@@ -119,16 +107,6 @@ class BlockCipherCFB(BlockCipher):
     def decryptor(self):
         return self._cipher.decryptor()
 
-    @classmethod
-    def encrypt(cls, key, data, *, iv):
-        cipher = cls(key, iv=iv)
-        return _utils._perform_encryption(cipher, data)
-
-    @classmethod
-    def decrypt(cls, key, data, *, iv):
-        cipher = cls(key, iv=iv)
-        return _utils._perform_decryption(cipher, data)
-
 
 @StreamCipher.register
 class BlockCipherCTR(BlockCipher):
@@ -142,13 +120,3 @@ class BlockCipherCTR(BlockCipher):
 
     def decryptor(self):
         return self._cipher.decryptor()
-
-    @classmethod
-    def encrypt(cls, key, data, *, nonce):
-        cipher = cls(key, nonce=nonce)
-        return _utils._perform_encryption(cipher, data)
-
-    @classmethod
-    def decrypt(cls, key, data, *, nonce):
-        cipher = cls(key, nonce=nonce)
-        return _utils._perform_decryption(cipher, data)

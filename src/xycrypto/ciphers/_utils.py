@@ -22,18 +22,6 @@ def _determine_decryptor(cipher, padding):
     return padding.wrap_decryptor(decryptor)
 
 
-def _perform_encryption(cipher, data):
-    encryptor = cipher.encryptor()
-    temp = encryptor.update(data)
-    return temp + encryptor.finalize()
-
-
-def _perform_decryption(cipher, data):
-    decryptor = cipher.decryptor()
-    temp = decryptor.update(data)
-    return temp + decryptor.finalize()
-
-
 def _make_X(cipher_attrs):
     def _X(cipher_base):
         name = cipher_base.__name__ + '_' + cipher_attrs['name']
