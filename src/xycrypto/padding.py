@@ -203,6 +203,6 @@ def _lookup_padding(padding):
         padding = _PADDING_TABLE.get(padding.upper(), None)
         if padding is not None:
             return padding
-    elif isinstance(padding, Padding):
+    elif issubclass(padding, Padding):
         return padding
     raise ValueError('padding must be in {}'.format(set(_PADDING_TABLE.keys())))
