@@ -9,7 +9,7 @@ class Cipher(metaclass=abc.ABCMeta):
     @property
     @abc.abstractmethod
     def _algorithm(self):
-        """The algorithm of this cipher."""
+        """The algorithm of cipher."""
 
 
 class StreamCipher(Cipher):
@@ -31,7 +31,7 @@ class BlockCipher(Cipher):
     @property
     @abc.abstractmethod
     def block_size(self):
-        """The block size in bytes of this cipher."""
+        """The block size in bytes of cipher."""
 
 
 class BlockCipherECB(BlockCipher):
