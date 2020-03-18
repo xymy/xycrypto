@@ -25,6 +25,8 @@ class _CommonPadder(object):
 
     @staticmethod
     def _pad(padded_size):
+        """Return the padding."""
+
         raise NotImplementedError
 
 
@@ -57,10 +59,14 @@ class _CommonUnpadder(object):
 
     @staticmethod
     def _check(buffer, padded_size):
+        """Check the padding."""
+
         raise NotImplementedError
 
 
 class Padding(metaclass=abc.ABCMeta):
+    """Abstract base class for padding."""
+
     @property
     @abc.abstractmethod
     def _padder_cls(self):
@@ -72,7 +78,7 @@ class Padding(metaclass=abc.ABCMeta):
         """The class of unpadder context."""
 
     def __init__(self, block_size):
-        """Prepare the context."""
+        """Prepare the padding context."""
 
         if not isinstance(block_size, int):
             raise TypeError('block_size must be int, got {}'.format(type(block_size).__name__))
