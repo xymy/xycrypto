@@ -1,35 +1,67 @@
 # xycrypto
 
-## Usage
+## Ciphers
+
+The `xycrypto` provides simple and elegant interfaces for ciphers.
+
+The cryptography components for ciphers we support:
+- Available *stream cipher*: `ARC4`, `ChaCha20`.
+- Available *block cipher*: `AES`, `TripleDES`.
+- Available *mode*: `ECB`, `CBC`, `OFB`, `CFB`, `CTR`.
+- Available *padding*: `PKCS7`, `ANSIX923`, `ISO10126`.
+
+### Usage
+
+**Firstly**, you should import the cipher class from the package `xycrypto.ciphers`. The cipher class follows the following naming conventions:
+- For *stream cipher*, `<cipher_name>`.
+- For *block cipher*, `<cipher_name>_<mode>`.
 
 ```python
->>> from xycrypto.hashes import SHA256
-
-# Hash byte string using classmethod SHA256.hash.
->>> SHA256.hash(b'Hello, world!')
-b'1_[\xdbv\xd0x\xc4;\x8a\xc0\x06NJ\x01da+\x1f\xcew\xc8i4[\xfc\x94\xc7X\x94\xed\xd3'
-
-# If you want hex-string.
->>> SHA256.hash(b'Hello, world!').hex()
-'315f5bdb76d078c43b8ac0064e4a0164612b1fce77c869345bfc94c75894edd3'
-
-# Hash unicode string, encoded as UTF-8.
->>> SHA256.hash('Hello, world!').hex() 
-'315f5bdb76d078c43b8ac0064e4a0164612b1fce77c869345bfc94c75894edd3'
-
-# Hash file using classmethod SHA256.hash_file.
->>> SHA256.hash_file('path/to/file').hex()
-'e69bd8e7e0dfadcda3f9785668c3918c469ebbe30fa42fb1158b638afdb9f7f7'
-
-# Hash directory using classmethod SHA256.hash_dir.
->>> SHA256.hash_dir('path/to/dir').hex()
-'746a5c6a0aac95507c96a192071ccdd762b5c69372d0cc66973a1e1dfcc73927'
-
-# Context Interface.
->>> ctx = SHA256()
->>> ctx.update(b'Hello, world!')
->>> ctx.finalize().hex()
-'315f5bdb76d078c43b8ac0064e4a0164612b1fce77c869345bfc94c75894edd3'
+>>> from xycrypto.ciphers import AES_CBC
 ```
 
-Support `MD5`, `SHA1`, `SHA224`, `SHA256`, `SHA384`, `SHA512`, `SHA3_224`, `SHA3_256`, `SHA3_384`, `SHA3_512`, `SHAKE128`, `SHAKE256`, `BLAKE2b`, `BLAKE2s`.
+**Secondly**, you should create the instance of the cipher class. In this case, you should provide some arguments:
+- *key* for all ciphers.
+- *iv* for *block cipher* in `ECB`, `CBC`, `OFB`, `CFB` mode.
+- *nonce* for *block cipher* in `CTR` mode.
+- *padding* for *block cipher* in `ECB`, `CBC` mode.
+
+```python
+# The len(key) is 16 bytes for AES-128, you can use 32 bytes key for AES-256.
+>>> key = b'0123456789abcdef'
+# Note len(iv) should be equal to AES_CBC.block_size.
+>>> iv = b'0123456789abcdef'
+# We use PKCS7 padding.
+>>> cipher = AES_CBC(key, iv=iv, padding='PKCS7')
+```
+
+**Finally**, call `encrypt` or `decrypt` method to encrypt or decrypt data respectively.
+
+```python
+>>> plaintext = b'Welcome to xycrypto!'
+>>> ciphertext = cipher.encrypt(plaintext) 
+>>> ciphertext
+b'3\x0f\xad\xa6\x17\xc4}\xb9\t\x17\xf8\xae\xbb\xa2t\xb9o\xf2\xf6\x16\t\x0803\xaci\x0c\x19q\x9d\xa3O'
+>>> cipher.decrypt(ciphertext)
+b'Welcome to xycrypto!'
+```
+
+### Example
+
+```python
+>>> from xycrypto.ciphers import AES_CBC
+
+# The len(key) is 16 bytes for AES-128, you can use 32 bytes key for AES-256.
+>>> key = b'0123456789abcdef'
+# Note len(iv) should be equal to AES_CBC.block_size.
+>>> iv = b'0123456789abcdef'
+# We use PKCS7 padding.
+>>> cipher = AES_CBC(key, iv=iv, padding='PKCS7')
+
+>>> plaintext = b'Welcome to xycrypto!'
+>>> ciphertext = cipher.encrypt(plaintext) 
+>>> ciphertext
+b'3\x0f\xad\xa6\x17\xc4}\xb9\t\x17\xf8\xae\xbb\xa2t\xb9o\xf2\xf6\x16\t\x0803\xaci\x0c\x19q\x9d\xa3O'
+>>> cipher.decrypt(ciphertext)
+b'Welcome to xycrypto!'
+```
