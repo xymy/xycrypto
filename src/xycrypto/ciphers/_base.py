@@ -20,11 +20,15 @@ class Cipher(metaclass=abc.ABCMeta):
         """Return the decryptor context."""
 
     def encrypt(self, data):
+        """Encrypt data and return."""
+
         encryptor = self.encryptor()
         temp = encryptor.update(data)
         return temp + encryptor.finalize()
 
     def decrypt(self, data):
+        """Decrypt data and return."""
+
         decryptor = self.decryptor()
         temp = decryptor.update(data)
         return temp + decryptor.finalize()
@@ -81,11 +85,11 @@ class BlockCipherCBC(BlockCipher):
 
 
 @StreamCipher.register
-class BlockCipherOFB(BlockCipher):
-    """Abstract base class for block cipher in OFB mode."""
+class BlockCipherCFB(BlockCipher):
+    """Abstract base class for block cipher in CFB mode."""
 
     def __init__(self, key, *, iv):
-        self._cipher = _lib.Cipher(self._algorithm(key), _lib.OFB(iv), _lib.backend)
+        self._cipher = _lib.Cipher(self._algorithm(key), _lib.CFB(iv), _lib.backend)
 
     def encryptor(self):
         return self._cipher.encryptor()
@@ -95,11 +99,11 @@ class BlockCipherOFB(BlockCipher):
 
 
 @StreamCipher.register
-class BlockCipherCFB(BlockCipher):
-    """Abstract base class for block cipher in CFB mode."""
+class BlockCipherOFB(BlockCipher):
+    """Abstract base class for block cipher in OFB mode."""
 
     def __init__(self, key, *, iv):
-        self._cipher = _lib.Cipher(self._algorithm(key), _lib.CFB(iv), _lib.backend)
+        self._cipher = _lib.Cipher(self._algorithm(key), _lib.OFB(iv), _lib.backend)
 
     def encryptor(self):
         return self._cipher.encryptor()

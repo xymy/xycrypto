@@ -17,11 +17,11 @@ class TripleDES_CBC(_X(_base.BlockCipherCBC)):
     pass
 
 
-class TripleDES_OFB(_X(_base.BlockCipherOFB)):
+class TripleDES_CFB(_X(_base.BlockCipherCFB)):
     pass
 
 
-class TripleDES_CFB(_X(_base.BlockCipherCFB)):
+class TripleDES_OFB(_X(_base.BlockCipherOFB)):
     pass
 
 

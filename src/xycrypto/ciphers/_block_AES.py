@@ -17,11 +17,11 @@ class AES_CBC(_X(_base.BlockCipherCBC)):
     pass
 
 
-class AES_OFB(_X(_base.BlockCipherOFB)):
+class AES_CFB(_X(_base.BlockCipherCFB)):
     pass
 
 
-class AES_CFB(_X(_base.BlockCipherCFB)):
+class AES_OFB(_X(_base.BlockCipherOFB)):
     pass
 
 
