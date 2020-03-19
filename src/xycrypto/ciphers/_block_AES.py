@@ -3,7 +3,8 @@ from . import _base, _lib, _utils
 _AES_ATTRS = {
     '_algorithm': _lib.AES,
     'name': 'AES',
-    'block_size': 16
+    'block_size': 16,
+    'key_sizes': frozenset([16, 24, 32])
 }
 
 _X = _utils._make_X(_AES_ATTRS)
