@@ -1,13 +1,19 @@
 # xycrypto
 
+## Installation
+
+```shell
+pip install -U xycrypto
+```
+
 ## Ciphers
 
 The `xycrypto` provides simple and elegant interfaces for ciphers.
 
 The cryptography components for ciphers we support:
-- Available *stream cipher*: `ARC4`, `ChaCha20`.
-- Available *block cipher*: `AES`, `TripleDES`.
-- Available *mode*: `ECB`, `CBC`, `OFB`, `CFB`, `CTR`.
+- Available *stream cipher*: `ChaCha20`, `RC4`.
+- Available *block cipher*: `AES`, `DES`, `TripleDES`.
+- Available *mode*: `ECB`, `CBC`, `CFB`, `OFB`, `CTR`.
 - Available *padding*: `PKCS7`, `ANSIX923`, `ISO10126`.
 
 ### Usage
