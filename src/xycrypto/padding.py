@@ -1,4 +1,5 @@
 import abc
+import inspect
 import os
 
 __all__ = ['PKCS7', 'ANSIX923', 'ISO10126']
@@ -199,10 +200,11 @@ _PADDING_TABLE = {
 
 
 def _lookup_padding(padding):
-    if isinstance(padding, str):
-        padding = _PADDING_TABLE.get(padding.upper(), None)
-        if padding is not None:
-            return padding
-    elif issubclass(padding, Padding):
+    if inspect.isclass(padding) and issubclass(padding, Padding):
         return padding
-    raise ValueError('padding must be in {}'.format(set(_PADDING_TABLE.keys())))
+    if isinstance(padding, str):
+        try:
+            return _PADDING_TABLE[padding.upper()]
+        except KeyError:
+            pass
+    raise ValueError('padding must be in {}'.format(set(_PADDING_TABLE)))
