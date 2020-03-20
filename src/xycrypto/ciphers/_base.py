@@ -12,6 +12,12 @@ class Cipher(metaclass=abc.ABCMeta):
         """The algorithm of cipher."""
 
     @abc.abstractmethod
+    def __init__(self, algorithm, mode):
+        """Prepare the cipher context."""
+
+        self._cipher = _lib.Cipher(algorithm, mode, _lib.backend)
+
+    @abc.abstractmethod
     def encryptor(self):
         """Return the encryptor context."""
 
@@ -32,6 +38,10 @@ class Cipher(metaclass=abc.ABCMeta):
         decryptor = self.decryptor()
         temp = decryptor.update(data)
         return temp + decryptor.finalize()
+
+    @property
+    def key_size(self):
+        return self._cipher.algorithm.key_size // 8
 
 
 class StreamCipher(Cipher):
