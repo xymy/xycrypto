@@ -1,5 +1,5 @@
 from ._stream import (                  # NOQA; isort:skip
-    RC4, ChaCha20
+    ChaCha20, RC4
 )
 from ._block_AES import (               # NOQA; isort:skip
     AES, AES_ECB, AES_CBC, AES_CFB, AES_OFB, AES_CTR
