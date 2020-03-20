@@ -10,6 +10,10 @@ _AES_ATTRS = {
 _X = _utils._make_X(_AES_ATTRS)
 
 
+class AES(_X(_base.BlockCipher)):
+    pass
+
+
 class AES_ECB(_X(_base.BlockCipherECB)):
     pass
 

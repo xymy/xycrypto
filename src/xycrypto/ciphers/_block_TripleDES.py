@@ -10,6 +10,10 @@ _TripleDES_ATTRS = {
 _X = _utils._make_X(_TripleDES_ATTRS)
 
 
+class TripleDES(_X(_base.BlockCipher)):
+    pass
+
+
 class TripleDES_ECB(_X(_base.BlockCipherECB)):
     pass
 
