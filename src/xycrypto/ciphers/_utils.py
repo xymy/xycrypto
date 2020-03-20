@@ -42,7 +42,7 @@ def _setup_mode_padding(mode, **kwargs):
     # For ECB and CBC modes, the default padding is PKCS7.
     # For other modes, padding will not be added automatically.
     # However, user can force padding by providing the padding argument.
-    if mode.__name__ in {'ECB', 'CBC'}:
+    if mode.name in {'ECB', 'CBC'}:
         padding = kwargs.pop('padding', 'PKCS7')
     else:
         padding = kwargs.pop('padding', None)
