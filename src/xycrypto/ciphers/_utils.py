@@ -1,4 +1,53 @@
+import inspect
+
 from xycrypto.padding import _lookup_padding
+
+from . import _lib
+
+_MODE_TABLE = {
+    'ECB': _lib.ECB,
+    'CBC': _lib.CBC,
+    'CFB': _lib.CFB,
+    'OFB': _lib.OFB,
+    'CTR': _lib.CTR
+}
+
+
+def _lookup_mode(mode):
+    if inspect.isclass(mode) and issubclass(mode, _lib.Mode):
+        return mode
+    if isinstance(mode, str):
+        try:
+            return _MODE_TABLE[mode.upper()]
+        except KeyError:
+            pass
+    raise ValueError('mode must be in {}'.format(set(_MODE_TABLE)))
+
+
+def _setup_mode_padding(mode, **kwargs):
+    mode = _lookup_mode(mode)
+
+    args = {}
+    if issubclass(mode, _lib.ModeWithInitializationVector):
+        try:
+            args['initialization_vector'] = kwargs['iv']
+        except KeyError:
+            raise TypeError('missing required keyword-only argument: "iv"')
+    if issubclass(mode, _lib.ModeWithNonce):
+        try:
+            args['nonce'] = kwargs['nonce']
+        except KeyError:
+            raise TypeError('missing required keyword-only argument: "nonce"')
+
+    # For ECB and CBC modes, the default padding is PKCS7.
+    # For other modes, padding will not be added automatically.
+    # However, user can force padding by providing the padding argument.
+    if mode.__name__ in {'ECB', 'CBC'}:
+        padding = kwargs.pop('padding', 'PKCS7')
+    else:
+        padding = kwargs.pop('padding', None)
+
+    return mode(**args), padding
 
 
 def _determine_padding(padding, block_size):

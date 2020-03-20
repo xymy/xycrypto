@@ -5,7 +5,8 @@ from cryptography.hazmat.primitives.ciphers.algorithms import (         # NOQA; 
     AES, Blowfish, Camellia, CAST5, IDEA, SEED, TripleDES
 )
 from cryptography.hazmat.primitives.ciphers.modes import (              # NOQA; isort:skip
-    ECB, CBC, CFB, OFB, CTR
+    ECB, CBC, CFB, OFB, CTR,
+    Mode, ModeWithInitializationVector, ModeWithNonce
 )
 
 backend = default_backend()
