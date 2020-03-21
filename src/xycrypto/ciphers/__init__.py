@@ -5,14 +5,14 @@ from ._block_AES import (               # NOQA; isort:skip
     AES, AES_ECB, AES_CBC, AES_CFB, AES_OFB, AES_CTR
 )
 from ._block_TripleDES import (         # NOQA; isort:skip
-    TripleDES, TripleDES_ECB, TripleDES_CBC, TripleDES_CFB, TripleDES_OFB, TripleDES_CTR
+    TripleDES, TripleDES_ECB, TripleDES_CBC, TripleDES_CFB, TripleDES_OFB
 )
 
 __all__ = [
     'ARC4', 'ChaCha20', 'RC4',
     'AES', 'AES_ECB', 'AES_CBC', 'AES_CFB', 'AES_OFB', 'AES_CTR',
-    'DES', 'DES_ECB', 'DES_CBC', 'DES_CFB', 'DES_OFB', 'DES_CTR',
-    'TripleDES', 'TripleDES_ECB', 'TripleDES_CBC', 'TripleDES_CFB', 'TripleDES_OFB', 'TripleDES_CTR'
+    'DES', 'DES_ECB', 'DES_CBC', 'DES_CFB', 'DES_OFB',
+    'TripleDES', 'TripleDES_ECB', 'TripleDES_CBC', 'TripleDES_CFB', 'TripleDES_OFB',
 ]
 
 ARC4 = RC4                              # alias
@@ -23,4 +23,3 @@ DES_ECB = TripleDES_ECB
 DES_CBC = TripleDES_CBC
 DES_CFB = TripleDES_CFB
 DES_OFB = TripleDES_OFB
-DES_CTR = TripleDES_CTR
