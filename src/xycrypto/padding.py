@@ -6,6 +6,8 @@ __all__ = ['PKCS7', 'ANSIX923', 'ISO10126']
 
 
 class PadderContext(metaclass=abc.ABCMeta):
+    """Abstract base class for padder context."""
+
     def __init__(self, block_size):
         """Initialize the current context."""
 
@@ -31,6 +33,8 @@ class PadderContext(metaclass=abc.ABCMeta):
 
 
 class UnpadderContext(metaclass=abc.ABCMeta):
+    """Abstract base class for unpadder context."""
+
     def __init__(self, block_size):
         """Initialize the current context."""
 
