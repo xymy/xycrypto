@@ -5,7 +5,7 @@ import os
 __all__ = ['PKCS7', 'ANSIX923', 'ISO10126']
 
 
-class _CommonPadder(object):
+class PadderContext(metaclass=abc.ABCMeta):
     def __init__(self, block_size):
         """Initialize the current context."""
 
@@ -25,13 +25,12 @@ class _CommonPadder(object):
         return self._pad(padded_size)
 
     @staticmethod
+    @abc.abstractmethod
     def _pad(padded_size):
         """Return the padding."""
 
-        raise NotImplementedError
 
-
-class _CommonUnpadder(object):
+class UnpadderContext(metaclass=abc.ABCMeta):
     def __init__(self, block_size):
         """Initialize the current context."""
 
@@ -59,10 +58,9 @@ class _CommonUnpadder(object):
         return self._buf[:-padded_size]
 
     @staticmethod
+    @abc.abstractmethod
     def _check(buffer, padded_size):
         """Check the padding."""
-
-        raise NotImplementedError
 
 
 class Padding(metaclass=abc.ABCMeta):
@@ -122,13 +120,13 @@ class Padding(metaclass=abc.ABCMeta):
 # ==============
 
 
-class _PKCS7Padder(_CommonPadder):
+class _PKCS7Padder(PadderContext):
     @staticmethod
     def _pad(padded_size):
         return padded_size.to_bytes(1, 'big') * padded_size
 
 
-class _PKCS7Unpadder(_CommonUnpadder):
+class _PKCS7Unpadder(UnpadderContext):
     @staticmethod
     def _check(buffer, padded_size):
         for i in range(2, padded_size + 1):
@@ -146,13 +144,13 @@ class PKCS7(Padding):
 # ==================
 
 
-class _ANSIX923Padder(_CommonPadder):
+class _ANSIX923Padder(PadderContext):
     @staticmethod
     def _pad(padded_size):
         return b'\x00' * (padded_size - 1) + padded_size.to_bytes(1, 'big')
 
 
-class _ANSIX923Unpadder(_CommonUnpadder):
+class _ANSIX923Unpadder(UnpadderContext):
     @staticmethod
     def _check(buffer, padded_size):
         for i in range(2, padded_size + 1):
@@ -170,13 +168,13 @@ class ANSIX923(Padding):
 # =================
 
 
-class _ISO10126Padder(_CommonPadder):
+class _ISO10126Padder(PadderContext):
     @staticmethod
     def _pad(padded_size):
         return os.urandom(padded_size - 1) + padded_size.to_bytes(1, 'big')
 
 
-class _ISO10126Unpadder(_CommonUnpadder):
+class _ISO10126Unpadder(UnpadderContext):
     @staticmethod
     def _check(buffer, padded_size):
         pass    # no need to check
