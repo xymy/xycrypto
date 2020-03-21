@@ -11,6 +11,12 @@ class Cipher(metaclass=abc.ABCMeta):
     def _algorithm(self):
         """The algorithm of cipher."""
 
+    @property
+    def key_size(self):
+        """The key size in bytes of cipher."""
+
+        return self._cipher.algorithm.key_size // 8
+
     @abc.abstractmethod
     def __init__(self, algorithm, mode):
         """Prepare the cipher context."""
@@ -39,12 +45,6 @@ class Cipher(metaclass=abc.ABCMeta):
         temp = decryptor.update(data)
         return temp + decryptor.finalize()
 
-    @property
-    def key_size(self):
-        """The key size in bytes of cipher."""
-
-        return self._cipher.algorithm.key_size // 8
-
 
 class StreamCipher(Cipher):
     """Abstract base class for stream cipher."""
@@ -67,6 +67,12 @@ class BlockCipher(Cipher):
     def block_size(self):
         """The block size in bytes of cipher."""
 
+    @property
+    def mode_name(self):
+        """The mode name of cipher."""
+
+        return self._cipher.mode.name
+
     def __init__(self, key, mode, **kwargs):
         mode, padding = _utils._setup_mode_padding(mode, **kwargs)
         self._cipher = _lib.Cipher(self._algorithm(key), mode, _lib.backend)
@@ -82,6 +88,8 @@ class BlockCipher(Cipher):
 class BlockCipherECB(BlockCipher):
     """Abstract base class for block cipher in ECB mode."""
 
+    mode_name = 'ECB'
+
     def __init__(self, key, *, padding='PKCS7'):
         self._cipher = _lib.Cipher(self._algorithm(key), _lib.ECB(), _lib.backend)
         self._padding = _utils._determine_padding(padding, self.block_size)
@@ -89,6 +97,8 @@ class BlockCipherECB(BlockCipher):
 
 class BlockCipherCBC(BlockCipher):
     """Abstract base class for block cipher in CBC mode."""
+
+    mode_name = 'CBC'
 
     def __init__(self, key, *, iv, padding='PKCS7'):
         self._cipher = _lib.Cipher(self._algorithm(key), _lib.CBC(iv), _lib.backend)
@@ -99,6 +109,8 @@ class BlockCipherCBC(BlockCipher):
 class BlockCipherCFB(BlockCipher):
     """Abstract base class for block cipher in CFB mode."""
 
+    mode_name = 'CFB'
+
     def __init__(self, key, *, iv, padding=None):
         self._cipher = _lib.Cipher(self._algorithm(key), _lib.CFB(iv), _lib.backend)
         self._padding = _utils._determine_padding(padding, self.block_size)
@@ -108,6 +120,8 @@ class BlockCipherCFB(BlockCipher):
 class BlockCipherOFB(BlockCipher):
     """Abstract base class for block cipher in OFB mode."""
 
+    mode_name = 'OFB'
+
     def __init__(self, key, *, iv, padding=None):
         self._cipher = _lib.Cipher(self._algorithm(key), _lib.OFB(iv), _lib.backend)
         self._padding = _utils._determine_padding(padding, self.block_size)
@@ -116,6 +130,8 @@ class BlockCipherOFB(BlockCipher):
 @StreamCipher.register
 class BlockCipherCTR(BlockCipher):
     """Abstract base class for block cipher in CTR mode."""
+
+    mode_name = 'CTR'
 
     def __init__(self, key, *, nonce, padding=None):
         self._cipher = _lib.Cipher(self._algorithm(key), _lib.CTR(nonce), _lib.backend)
