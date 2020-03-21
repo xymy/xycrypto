@@ -41,6 +41,8 @@ class Cipher(metaclass=abc.ABCMeta):
 
     @property
     def key_size(self):
+        """The key size in bytes of cipher."""
+
         return self._cipher.algorithm.key_size // 8
 
 
