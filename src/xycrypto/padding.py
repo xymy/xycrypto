@@ -68,6 +68,37 @@ class UnpadderContext(metaclass=abc.ABCMeta):
         """Check the padding."""
 
 
+class FastUnpadderContext(UnpadderContext):
+    """Abstract base class for fast unpadder context."""
+
+    def __init__(self, block_size, total_size):
+        """Initialize the current context."""
+
+        self.block_size = block_size
+        self._size = total_size
+        self._buf = b''
+
+    def update(self, data):
+        """Update the current context."""
+
+        remaining_size = self._size - len(data)
+        if remaining_size < 0:
+            raise ValueError('too much data')
+        self._size = remaining_size
+
+        buffered_size = self.block_size - remaining_size
+        if buffered_size > 0:
+            self._buf += data[-buffered_size:]
+            return data[:-buffered_size]
+        else:
+            return data
+
+    def finalize(self):
+        """Finalize the current context and return the rest of the data."""
+
+        return super().finalize()
+
+
 class Padding(metaclass=abc.ABCMeta):
     """Abstract base class for padding."""
 
@@ -80,6 +111,11 @@ class Padding(metaclass=abc.ABCMeta):
     @abc.abstractmethod
     def _unpadder_cls(self):
         """The class of unpadder context."""
+
+    @property
+    @abc.abstractmethod
+    def _fast_unpadder_cls(self):
+        """The class of fast unpadder context."""
 
     def __init__(self, block_size):
         """Prepare the padding context."""
@@ -100,6 +136,11 @@ class Padding(metaclass=abc.ABCMeta):
         """Return the unpadder context."""
 
         return self._unpadder_cls(self.block_size)
+
+    def fast_unpadder(self, total_size):
+        """Return the fast unpadder context."""
+
+        return self._fast_unpadder_cls(self.block_size, total_size)
 
     class _PaddingWrapper(object):
         def __init__(self, padded_ctx, padding_ctx):
@@ -139,9 +180,14 @@ class _PKCS7Unpadder(UnpadderContext):
                 raise ValueError('invalid padding')
 
 
+class _PKCS7FastUnpadder(FastUnpadderContext):
+    _check = _PKCS7Unpadder._check
+
+
 class PKCS7(Padding):
     _padder_cls = _PKCS7Padder
     _unpadder_cls = _PKCS7Unpadder
+    _fast_unpadder_cls = _PKCS7FastUnpadder
 
 
 # ==================
@@ -163,9 +209,14 @@ class _ANSIX923Unpadder(UnpadderContext):
                 raise ValueError('invalid padding')
 
 
+class _ANSIX923FastUnpadder(FastUnpadderContext):
+    _check = _ANSIX923Unpadder._check
+
+
 class ANSIX923(Padding):
     _padder_cls = _ANSIX923Padder
     _unpadder_cls = _ANSIX923Unpadder
+    _fast_unpadder_cls = _ANSIX923FastUnpadder
 
 
 # =================
@@ -185,9 +236,14 @@ class _ISO10126Unpadder(UnpadderContext):
         pass    # no need to check
 
 
+class _ISO10126FastUnpadder(FastUnpadderContext):
+    _check = _ISO10126Unpadder._check
+
+
 class ISO10126(Padding):
     _padder_cls = _ISO10126Padder
     _unpadder_cls = _ISO10126Unpadder
+    _fast_unpadder_cls = _ISO10126FastUnpadder
 
 
 # ==============
