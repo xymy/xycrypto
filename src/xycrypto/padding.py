@@ -71,32 +71,33 @@ class UnpadderContext(metaclass=abc.ABCMeta):
 class FastUnpadderContext(UnpadderContext):
     """Abstract base class for fast unpadder context."""
 
-    def __init__(self, block_size, total_size):
+    def __init__(self, block_size):
         """Initialize the current context."""
 
         self.block_size = block_size
-        self._size = total_size
         self._buf = b''
 
     def update(self, data):
         """Update the current context."""
 
-        remaining_size = self._size - len(data)
-        if remaining_size < 0:
-            raise ValueError('too much data')
-        self._size = remaining_size
+        if len(data) < self.block_size:
+            raise ValueError('require len(data) >= {}'.format(self.block_size))
 
-        buffered_size = self.block_size - remaining_size
-        if buffered_size > 0:
-            self._buf += data[-buffered_size:]
-            return data[:-buffered_size]
-        else:
-            return data
+        result = self._buf
+        self._buf = data
+        return result
 
     def finalize(self):
         """Finalize the current context and return the rest of the data."""
 
-        return super().finalize()
+        if len(self._buf) < self.block_size:
+            raise ValueError('incomplete padding')
+
+        padded_size = self._buf[-1]
+        if padded_size > self.block_size:
+            raise ValueError('invalid padding')
+        self._check(self._buf, padded_size)
+        return self._buf[:-padded_size]
 
 
 class Padding(metaclass=abc.ABCMeta):
@@ -137,10 +138,10 @@ class Padding(metaclass=abc.ABCMeta):
 
         return self._unpadder_cls(self.block_size)
 
-    def fast_unpadder(self, total_size):
+    def fast_unpadder(self):
         """Return the fast unpadder context."""
 
-        return self._fast_unpadder_cls(self.block_size, total_size)
+        return self._fast_unpadder_cls(self.block_size)
 
     class _PaddingWrapper(object):
         def __init__(self, padded_ctx, padding_ctx):
