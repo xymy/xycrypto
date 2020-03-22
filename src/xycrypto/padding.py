@@ -53,14 +53,18 @@ class UnpadderContext(metaclass=abc.ABCMeta):
     def finalize(self):
         """Finalize the current context and return the rest of the data."""
 
-        if len(self._buf) != self.block_size:
-            raise ValueError('incomplete padding')
-
+        self._check_before_finalize()
         padded_size = self._buf[-1]
         if padded_size > self.block_size:
             raise ValueError('invalid padding')
         self._check(self._buf, padded_size)
         return self._buf[:-padded_size]
+
+    def _check_before_finalize(self):
+        """Check prerequisite."""
+
+        if len(self._buf) != self.block_size:
+            raise ValueError('incomplete padding')
 
     @staticmethod
     @abc.abstractmethod
@@ -70,12 +74,6 @@ class UnpadderContext(metaclass=abc.ABCMeta):
 
 class FastUnpadderContext(UnpadderContext):
     """Abstract base class for fast unpadder context."""
-
-    def __init__(self, block_size):
-        """Initialize the current context."""
-
-        self.block_size = block_size
-        self._buf = b''
 
     def update(self, data):
         """Update the current context."""
@@ -87,17 +85,11 @@ class FastUnpadderContext(UnpadderContext):
         self._buf = data
         return result
 
-    def finalize(self):
-        """Finalize the current context and return the rest of the data."""
+    def _check_before_finalize(self):
+        """Check prerequisite."""
 
         if len(self._buf) < self.block_size:
             raise ValueError('incomplete padding')
-
-        padded_size = self._buf[-1]
-        if padded_size > self.block_size:
-            raise ValueError('invalid padding')
-        self._check(self._buf, padded_size)
-        return self._buf[:-padded_size]
 
 
 class Padding(metaclass=abc.ABCMeta):
