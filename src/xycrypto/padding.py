@@ -181,8 +181,8 @@ class PKCS7Unpadder(UnpadderContext):
                 raise ValueError('invalid padding')
 
 
-class PKCS7FastUnpadder(FastUnpadderContext):
-    _check = PKCS7Unpadder._check
+class PKCS7FastUnpadder(FastUnpadderContext, PKCS7Unpadder):
+    pass
 
 
 class PKCS7(Padding):
@@ -210,8 +210,8 @@ class ANSIX923Unpadder(UnpadderContext):
                 raise ValueError('invalid padding')
 
 
-class ANSIX923FastUnpadder(FastUnpadderContext):
-    _check = ANSIX923Unpadder._check
+class ANSIX923FastUnpadder(FastUnpadderContext, ANSIX923Unpadder):
+    pass
 
 
 class ANSIX923(Padding):
@@ -237,8 +237,8 @@ class ISO10126Unpadder(UnpadderContext):
         pass    # no need to check
 
 
-class ISO10126FastUnpadder(FastUnpadderContext):
-    _check = ISO10126Unpadder._check
+class ISO10126FastUnpadder(FastUnpadderContext, ISO10126Unpadder):
+    pass
 
 
 class ISO10126(Padding):
