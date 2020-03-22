@@ -45,16 +45,17 @@ class UnpadderContext(metaclass=abc.ABCMeta):
         """Update the current context."""
 
         self._buf += data
-        remaining_size = (len(self._buf) % self.block_size) or self.block_size
-        result = self._buf[:-remaining_size]
-        self._buf = self._buf[-remaining_size:]
+        buffered_size = (len(self._buf) % self.block_size) or self.block_size
+        result = self._buf[:-buffered_size]
+        self._buf = self._buf[-buffered_size:]
         return result
 
     def finalize(self):
         """Finalize the current context and return the rest of the data."""
 
         if len(self._buf) != self.block_size:
-            raise ValueError('invalid padding')
+            raise ValueError('incomplete padding')
+
         padded_size = self._buf[-1]
         if padded_size > self.block_size:
             raise ValueError('invalid padding')
