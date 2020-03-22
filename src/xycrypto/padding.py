@@ -166,13 +166,13 @@ class Padding(metaclass=abc.ABCMeta):
 # ==============
 
 
-class _PKCS7Padder(PadderContext):
+class PKCS7Padder(PadderContext):
     @staticmethod
     def _pad(padded_size):
         return padded_size.to_bytes(1, 'big') * padded_size
 
 
-class _PKCS7Unpadder(UnpadderContext):
+class PKCS7Unpadder(UnpadderContext):
     @staticmethod
     def _check(buffer, padded_size):
         for i in range(2, padded_size + 1):
@@ -180,14 +180,14 @@ class _PKCS7Unpadder(UnpadderContext):
                 raise ValueError('invalid padding')
 
 
-class _PKCS7FastUnpadder(FastUnpadderContext):
-    _check = _PKCS7Unpadder._check
+class PKCS7FastUnpadder(FastUnpadderContext):
+    _check = PKCS7Unpadder._check
 
 
 class PKCS7(Padding):
-    _padder_cls = _PKCS7Padder
-    _unpadder_cls = _PKCS7Unpadder
-    _fast_unpadder_cls = _PKCS7FastUnpadder
+    _padder_cls = PKCS7Padder
+    _unpadder_cls = PKCS7Unpadder
+    _fast_unpadder_cls = PKCS7FastUnpadder
 
 
 # ==================
@@ -195,13 +195,13 @@ class PKCS7(Padding):
 # ==================
 
 
-class _ANSIX923Padder(PadderContext):
+class ANSIX923Padder(PadderContext):
     @staticmethod
     def _pad(padded_size):
         return b'\x00' * (padded_size - 1) + padded_size.to_bytes(1, 'big')
 
 
-class _ANSIX923Unpadder(UnpadderContext):
+class ANSIX923Unpadder(UnpadderContext):
     @staticmethod
     def _check(buffer, padded_size):
         for i in range(2, padded_size + 1):
@@ -209,14 +209,14 @@ class _ANSIX923Unpadder(UnpadderContext):
                 raise ValueError('invalid padding')
 
 
-class _ANSIX923FastUnpadder(FastUnpadderContext):
-    _check = _ANSIX923Unpadder._check
+class ANSIX923FastUnpadder(FastUnpadderContext):
+    _check = ANSIX923Unpadder._check
 
 
 class ANSIX923(Padding):
-    _padder_cls = _ANSIX923Padder
-    _unpadder_cls = _ANSIX923Unpadder
-    _fast_unpadder_cls = _ANSIX923FastUnpadder
+    _padder_cls = ANSIX923Padder
+    _unpadder_cls = ANSIX923Unpadder
+    _fast_unpadder_cls = ANSIX923FastUnpadder
 
 
 # =================
@@ -224,26 +224,26 @@ class ANSIX923(Padding):
 # =================
 
 
-class _ISO10126Padder(PadderContext):
+class ISO10126Padder(PadderContext):
     @staticmethod
     def _pad(padded_size):
         return os.urandom(padded_size - 1) + padded_size.to_bytes(1, 'big')
 
 
-class _ISO10126Unpadder(UnpadderContext):
+class ISO10126Unpadder(UnpadderContext):
     @staticmethod
     def _check(buffer, padded_size):
         pass    # no need to check
 
 
-class _ISO10126FastUnpadder(FastUnpadderContext):
-    _check = _ISO10126Unpadder._check
+class ISO10126FastUnpadder(FastUnpadderContext):
+    _check = ISO10126Unpadder._check
 
 
 class ISO10126(Padding):
-    _padder_cls = _ISO10126Padder
-    _unpadder_cls = _ISO10126Unpadder
-    _fast_unpadder_cls = _ISO10126FastUnpadder
+    _padder_cls = ISO10126Padder
+    _unpadder_cls = ISO10126Unpadder
+    _fast_unpadder_cls = ISO10126FastUnpadder
 
 
 # ==============
