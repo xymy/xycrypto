@@ -150,8 +150,12 @@ class Padding(metaclass=abc.ABCMeta):
     def wrap_encryptor(self, encryptor_ctx):
         return self._PaddingWrapper(encryptor_ctx, self.padder())
 
-    def wrap_decryptor(self, decryptor_ctx):
-        return self._PaddingWrapper(self.unpadder(), decryptor_ctx)
+    def wrap_decryptor(self, decryptor_ctx, *, fast=True):
+        if fast:
+            unpadder = self.fast_unpadder()
+        else:
+            unpadder = self.unpadder()
+        return self._PaddingWrapper(unpadder, decryptor_ctx)
 
 
 # ==============
