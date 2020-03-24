@@ -5,25 +5,93 @@ import os
 __all__ = ['PKCS7', 'ANSIX923', 'ISO10126']
 
 
-class PadderContext(metaclass=abc.ABCMeta):
+# ============================================================================ #
+#                                  Interfaces                                  #
+# ============================================================================ #
+
+
+class Padding(metaclass=abc.ABCMeta):
+    """Abstract base class for padding."""
+
+    @abc.abstractmethod
+    def padder(self):
+        """Return the padder context."""
+
+    @abc.abstractmethod
+    def unpadder(self):
+        """Return the unpadder context."""
+
+    @abc.abstractmethod
+    def pad(self, data):
+        """Pad data and return padded data."""
+
+    @abc.abstractmethod
+    def unpad(self, data):
+        """Unpad data and return unpadded data."""
+
+
+class PaddingContext(metaclass=abc.ABCMeta):
+    """Abstract base class for padding context."""
+
+    @abc.abstractmethod
+    def update(self, data):
+        """Update the current context and return the available data."""
+
+    @abc.abstractmethod
+    def finalize(self):
+        """Finalize the current context and return the rest of the data."""
+
+
+class Padder(PaddingContext):
     """Abstract base class for padder context."""
 
-    def __init__(self, block_size):
-        """Initialize the current context."""
 
+class Unpadder(PaddingContext):
+    """Abstract base class for unpadder context."""
+
+
+# ============================================================================ #
+#                                  Frameworks                                  #
+# ============================================================================ #
+
+
+class _PaddingFramework(Padding):
+    def __init__(self, block_size):
+        if not isinstance(block_size, int):
+            raise TypeError(
+                'block_size must be int, got {}'.format(type(block_size).__name__)
+            )
+
+        if block_size < 1 or block_size > 255:
+            raise ValueError(
+                'block_size must be in [1, 255], got {}'.format(block_size)
+            )
+
+        self.block_size = block_size
+
+    def pad(self, data):
+        padder = self.padder()
+        temp = padder.update(data)
+        return temp + padder.finalize()
+
+    def unpad(self, data):
+        unpadder = self.unpadder()
+        temp = unpadder.update(data)
+        return temp + unpadder.finalize()
+
+
+class _PadderFramework(Padder):
+    def __init__(self, block_size):
         self.block_size = block_size
         self._size = 0
 
     def update(self, data):
-        """Update the current context."""
-
         self._size += len(data)
         return data
 
     def finalize(self):
-        """Finalize the current context and return the rest of the data."""
-
-        padded_size = self.block_size - (self._size % self.block_size)
+        block_size = self.block_size
+        padded_size = block_size - (self._size % block_size)
         return self._pad(padded_size)
 
     @staticmethod
@@ -32,39 +100,32 @@ class PadderContext(metaclass=abc.ABCMeta):
         """Return the padding."""
 
 
-class UnpadderContext(metaclass=abc.ABCMeta):
-    """Abstract base class for unpadder context."""
-
+class _UnpadderFramework(Unpadder):
     def __init__(self, block_size):
-        """Initialize the current context."""
-
         self.block_size = block_size
-        self._buf = b''
+        self._buffer = b''
 
     def update(self, data):
-        """Update the current context."""
+        block_size = self.block_size
+        if len(data) < block_size or (len(data) % block_size) != 0:
+            raise ValueError(
+                'require len(data) >= {0} and (len(data) % {0}) == 0'.format(block_size)
+            )
 
-        self._buf += data
-        buffered_size = (len(self._buf) % self.block_size) or self.block_size
-        result = self._buf[:-buffered_size]
-        self._buf = self._buf[-buffered_size:]
+        result = self._buffer
+        self._buffer = data
         return result
 
     def finalize(self):
-        """Finalize the current context and return the rest of the data."""
-
-        self._check_before_finalize()
-        padded_size = self._buf[-1]
-        if padded_size > self.block_size:
-            raise ValueError('invalid padding')
-        self._check(self._buf, padded_size)
-        return self._buf[:-padded_size]
-
-    def _check_before_finalize(self):
-        """Check prerequisite."""
-
-        if len(self._buf) != self.block_size:
+        block_size = self.block_size
+        if len(self._buffer) < block_size:
             raise ValueError('incomplete padding')
+
+        padded_size = self._buffer[-1]
+        if padded_size > block_size:
+            raise ValueError('invalid padding')
+        self._check(self._buffer, padded_size)
+        return self._buffer[:-padded_size]
 
     @staticmethod
     @abc.abstractmethod
@@ -72,104 +133,29 @@ class UnpadderContext(metaclass=abc.ABCMeta):
         """Check the padding."""
 
 
-class FastUnpadderContext(UnpadderContext):
-    """Abstract base class for fast unpadder context."""
-
-    def update(self, data):
-        """Update the current context."""
-
-        if len(data) < self.block_size:
-            raise ValueError('require len(data) >= {}'.format(self.block_size))
-
-        result = self._buf
-        self._buf = data
-        return result
-
-    def _check_before_finalize(self):
-        """Check prerequisite."""
-
-        if len(self._buf) < self.block_size:
-            raise ValueError('incomplete padding')
+# ============================================================================ #
+#                               Implementations                                #
+# ============================================================================ #
 
 
-class Padding(metaclass=abc.ABCMeta):
-    """Abstract base class for padding."""
+# 1. PKCS#7
 
-    @property
-    @abc.abstractmethod
-    def _padder_cls(self):
-        """The class of padder context."""
 
-    @property
-    @abc.abstractmethod
-    def _unpadder_cls(self):
-        """The class of unpadder context."""
-
-    @property
-    @abc.abstractmethod
-    def _fast_unpadder_cls(self):
-        """The class of fast unpadder context."""
-
-    def __init__(self, block_size):
-        """Prepare the padding context."""
-
-        if not isinstance(block_size, int):
-            raise TypeError('block_size must be int, got {}'.format(type(block_size).__name__))
-        if block_size < 1 or block_size > 255:
-            raise ValueError('block_size must be in [1, 255], got {}'.format(block_size))
-
-        self.block_size = block_size
-
+class PKCS7(_PaddingFramework):
     def padder(self):
-        """Return the padder context."""
-
-        return self._padder_cls(self.block_size)
+        return PKCS7Padder(self.block_size)
 
     def unpadder(self):
-        """Return the unpadder context."""
-
-        return self._unpadder_cls(self.block_size)
-
-    def fast_unpadder(self):
-        """Return the fast unpadder context."""
-
-        return self._fast_unpadder_cls(self.block_size)
-
-    class _PaddingWrapper(object):
-        def __init__(self, padded_ctx, padding_ctx):
-            self.padded_ctx = padded_ctx
-            self.padding_ctx = padding_ctx
-
-        def update(self, data):
-            return self.padded_ctx.update(self.padding_ctx.update(data))
-
-        def finalize(self):
-            temp = self.padded_ctx.update(self.padding_ctx.finalize())
-            return temp + self.padded_ctx.finalize()
-
-    def wrap_encryptor(self, encryptor_ctx):
-        return self._PaddingWrapper(encryptor_ctx, self.padder())
-
-    def wrap_decryptor(self, decryptor_ctx, *, fast=True):
-        if fast:
-            unpadder = self.fast_unpadder()
-        else:
-            unpadder = self.unpadder()
-        return self._PaddingWrapper(unpadder, decryptor_ctx)
+        return PKCS7Unpadder(self.block_size)
 
 
-# ==============
-# PKCS#7 Padding
-# ==============
-
-
-class PKCS7Padder(PadderContext):
+class PKCS7Padder(_PadderFramework):
     @staticmethod
     def _pad(padded_size):
         return padded_size.to_bytes(1, 'big') * padded_size
 
 
-class PKCS7Unpadder(UnpadderContext):
+class PKCS7Unpadder(_UnpadderFramework):
     @staticmethod
     def _check(buffer, padded_size):
         for i in range(2, padded_size + 1):
@@ -177,28 +163,24 @@ class PKCS7Unpadder(UnpadderContext):
                 raise ValueError('invalid padding')
 
 
-class PKCS7FastUnpadder(FastUnpadderContext, PKCS7Unpadder):
-    pass
+# 2. ANSI X9.23
 
 
-class PKCS7(Padding):
-    _padder_cls = PKCS7Padder
-    _unpadder_cls = PKCS7Unpadder
-    _fast_unpadder_cls = PKCS7FastUnpadder
+class ANSIX923(_PaddingFramework):
+    def padder(self):
+        return ANSIX923Padder(self.block_size)
+
+    def unpadder(self):
+        return ANSIX923Unpadder(self.block_size)
 
 
-# ==================
-# ANSI X9.23 Padding
-# ==================
-
-
-class ANSIX923Padder(PadderContext):
+class ANSIX923Padder(_PadderFramework):
     @staticmethod
     def _pad(padded_size):
         return b'\x00' * (padded_size - 1) + padded_size.to_bytes(1, 'big')
 
 
-class ANSIX923Unpadder(UnpadderContext):
+class ANSIX923Unpadder(_UnpadderFramework):
     @staticmethod
     def _check(buffer, padded_size):
         for i in range(2, padded_size + 1):
@@ -206,61 +188,67 @@ class ANSIX923Unpadder(UnpadderContext):
                 raise ValueError('invalid padding')
 
 
-class ANSIX923FastUnpadder(FastUnpadderContext, ANSIX923Unpadder):
-    pass
+# 3. ISO 10126
 
 
-class ANSIX923(Padding):
-    _padder_cls = ANSIX923Padder
-    _unpadder_cls = ANSIX923Unpadder
-    _fast_unpadder_cls = ANSIX923FastUnpadder
+class ISO10126(_PaddingFramework):
+    def padder(self):
+        return ISO10126Padder(self.block_size)
+
+    def unpadder(self):
+        return ISO10126Unpadder(self.block_size)
 
 
-# =================
-# ISO 10126 Padding
-# =================
-
-
-class ISO10126Padder(PadderContext):
+class ISO10126Padder(_PadderFramework):
     @staticmethod
     def _pad(padded_size):
         return os.urandom(padded_size - 1) + padded_size.to_bytes(1, 'big')
 
 
-class ISO10126Unpadder(UnpadderContext):
+class ISO10126Unpadder(_UnpadderFramework):
     @staticmethod
     def _check(buffer, padded_size):
         pass    # no need to check
 
 
-class ISO10126FastUnpadder(FastUnpadderContext, ISO10126Unpadder):
-    pass
-
-
-class ISO10126(Padding):
-    _padder_cls = ISO10126Padder
-    _unpadder_cls = ISO10126Unpadder
-    _fast_unpadder_cls = ISO10126FastUnpadder
-
-
-# ==============
-# Lookup Padding
-# ==============
+# ============================================================================ #
+#                                  Utilities                                   #
+# ============================================================================ #
 
 
 _PADDING_TABLE = {
     'PKCS7': PKCS7,
     'ANSIX923': ANSIX923,
-    'ISO10126': ISO10126
+    'ISO10126': ISO10126,
+    'P': PKCS7,
+    'A': ANSIX923,
+    'I': ISO10126
 }
 
 
 def _lookup_padding(padding):
     if inspect.isclass(padding) and issubclass(padding, Padding):
         return padding
+
     if isinstance(padding, str):
         try:
             return _PADDING_TABLE[padding.upper()]
         except KeyError:
             pass
-    raise ValueError('padding must be in {}'.format(set(_PADDING_TABLE)))
+
+    raise ValueError(
+        'padding must be in {}, got {}'.format(set(_PADDING_TABLE), padding)
+    )
+
+
+def _create_padding(padding, block_size):
+    padding = _lookup_padding(padding)
+    return padding(block_size)
+
+
+def _register_padding(padding_name, padding_class):
+    _PADDING_TABLE[padding_name.upper()] = padding_class
+
+
+def unregister_padding(padding_name):
+    del _PADDING_TABLE[padding_name.upper()]
