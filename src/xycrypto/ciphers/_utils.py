@@ -57,18 +57,31 @@ def _determine_padding(padding, block_size):
     return padding(block_size)
 
 
+class _PaddingWrapper(object):
+    def __init__(self, padded_ctx, padding_ctx):
+        self.padded_ctx = padded_ctx
+        self.padding_ctx = padding_ctx
+
+    def update(self, data):
+        return self.padded_ctx.update(self.padding_ctx.update(data))
+
+    def finalize(self):
+        temp = self.padded_ctx.update(self.padding_ctx.finalize())
+        return temp + self.padded_ctx.finalize()
+
+
 def _determine_encryptor(cipher, padding):
     encryptor = cipher.encryptor()
     if padding is None:
         return encryptor
-    return padding.wrap_encryptor(encryptor)
+    return _PaddingWrapper(encryptor, padding.padder())
 
 
 def _determine_decryptor(cipher, padding):
     decryptor = cipher.decryptor()
     if padding is None:
         return decryptor
-    return padding.wrap_decryptor(decryptor)
+    return _PaddingWrapper(padding.unpadder(), decryptor)
 
 
 def _make_X(cipher_attrs):
