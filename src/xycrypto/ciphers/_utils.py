@@ -1,6 +1,6 @@
 import inspect
 
-from xycrypto.padding import _lookup_padding
+from xycrypto.padding import _create_padding
 
 from . import _lib
 
@@ -53,8 +53,7 @@ def _setup_mode_padding(mode, **kwargs):
 def _determine_padding(padding, block_size):
     if padding is None:
         return None
-    padding = _lookup_padding(padding)
-    return padding(block_size)
+    return _create_padding(padding, block_size)
 
 
 class _PaddingWrapper(object):
