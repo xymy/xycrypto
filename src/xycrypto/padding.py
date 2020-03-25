@@ -2,7 +2,7 @@ import abc
 import inspect
 import os
 
-__all__ = ['PKCS7', 'ANSIX923', 'ISO10126']
+__all__ = ['DUMMY', 'PKCS7', 'ANSIX923', 'ISO10126']
 
 
 # ============================================================================ #
@@ -138,6 +138,48 @@ class _UnpadderFramework(Unpadder):
 # ============================================================================ #
 
 
+# 0. DUMMY
+
+
+class DUMMY(Padding):
+    def __init__(self, block_size):
+        pass
+
+    def padder(self):
+        return DUMMYPadder(0)
+
+    def unpadder(self):
+        return DUMMYUnpadder(0)
+
+    def pad(self, data):
+        return data
+
+    def unpad(self, data):
+        return data
+
+
+class DUMMYPadder(Padder):
+    def __init__(self, block_size):
+        pass
+
+    def update(self, data):
+        return data
+
+    def finalize(self):
+        return b''
+
+
+class DUMMYUnpadder(Unpadder):
+    def __init__(self, block_size):
+        pass
+
+    def update(self, data):
+        return data
+
+    def finalize(self):
+        return b''
+
+
 # 1. PKCS#7
 
 
@@ -217,9 +259,11 @@ class ISO10126Unpadder(_UnpadderFramework):
 
 
 _PADDING_TABLE = {
+    'DUMMY': DUMMY,
     'PKCS7': PKCS7,
     'ANSIX923': ANSIX923,
     'ISO10126': ISO10126,
+    'D': DUMMY,
     'P': PKCS7,
     'A': ANSIX923,
     'I': ISO10126
