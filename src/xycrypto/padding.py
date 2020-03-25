@@ -294,5 +294,5 @@ def _register_padding(padding_name, padding_class):
     _PADDING_TABLE[padding_name.upper()] = padding_class
 
 
-def unregister_padding(padding_name):
+def _unregister_padding(padding_name):
     del _PADDING_TABLE[padding_name.upper()]
