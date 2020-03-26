@@ -1,8 +1,11 @@
 import abc
 
+from xycrypto import ciphers
+
 from . import _lib, _utils
 
 
+@ciphers.Cipher.register
 class Cipher(metaclass=abc.ABCMeta):
     """Abstract base class for cipher."""
 
@@ -32,20 +35,21 @@ class Cipher(metaclass=abc.ABCMeta):
         """Return the decryptor context."""
 
     def encrypt(self, data):
-        """Encrypt data and return."""
+        """Encrypt data and return encrypted data."""
 
         encryptor = self.encryptor()
         temp = encryptor.update(data)
         return temp + encryptor.finalize()
 
     def decrypt(self, data):
-        """Decrypt data and return."""
+        """Decrypt data and return decrypted data."""
 
         decryptor = self.decryptor()
         temp = decryptor.update(data)
         return temp + decryptor.finalize()
 
 
+@ciphers.StreamCipher.register
 class StreamCipher(Cipher):
     """Abstract base class for stream cipher."""
 
@@ -59,6 +63,7 @@ class StreamCipher(Cipher):
         return self._cipher.decryptor()
 
 
+@ciphers.BlockCipher.register
 class BlockCipher(Cipher):
     """Abstract base class for block cipher."""
 
@@ -85,6 +90,7 @@ class BlockCipher(Cipher):
         return _utils._determine_decryptor(self._cipher, self._padding)
 
 
+@ciphers.BlockCipherECB.register
 class BlockCipherECB(BlockCipher):
     """Abstract base class for block cipher in ECB mode."""
 
@@ -95,6 +101,7 @@ class BlockCipherECB(BlockCipher):
         self._padding = _utils._determine_padding(padding, self.block_size)
 
 
+@ciphers.BlockCipherCBC.register
 class BlockCipherCBC(BlockCipher):
     """Abstract base class for block cipher in CBC mode."""
 
@@ -105,6 +112,7 @@ class BlockCipherCBC(BlockCipher):
         self._padding = _utils._determine_padding(padding, self.block_size)
 
 
+@ciphers.BlockCipherCFB.register
 @StreamCipher.register
 class BlockCipherCFB(BlockCipher):
     """Abstract base class for block cipher in CFB mode."""
@@ -116,6 +124,7 @@ class BlockCipherCFB(BlockCipher):
         self._padding = _utils._determine_padding(padding, self.block_size)
 
 
+@ciphers.BlockCipherOFB.register
 @StreamCipher.register
 class BlockCipherOFB(BlockCipher):
     """Abstract base class for block cipher in OFB mode."""
@@ -127,6 +136,7 @@ class BlockCipherOFB(BlockCipher):
         self._padding = _utils._determine_padding(padding, self.block_size)
 
 
+@ciphers.BlockCipherCTR.register
 @StreamCipher.register
 class BlockCipherCTR(BlockCipher):
     """Abstract base class for block cipher in CTR mode."""
