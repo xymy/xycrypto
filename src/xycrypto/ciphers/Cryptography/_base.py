@@ -90,8 +90,13 @@ class BlockCipher(Cipher):
         return _utils._determine_decryptor(self._cipher, self._padding)
 
 
+@ciphers.BlockCipherWithMode
+class BlockCipherWithMode(BlockCipher):
+    """Abstract base class for block cipher with mode."""
+
+
 @ciphers.BlockCipherECB.register
-class BlockCipherECB(BlockCipher):
+class BlockCipherECB(BlockCipherWithMode):
     """Abstract base class for block cipher in ECB mode."""
 
     mode_name = 'ECB'
@@ -102,7 +107,7 @@ class BlockCipherECB(BlockCipher):
 
 
 @ciphers.BlockCipherCBC.register
-class BlockCipherCBC(BlockCipher):
+class BlockCipherCBC(BlockCipherWithMode):
     """Abstract base class for block cipher in CBC mode."""
 
     mode_name = 'CBC'
@@ -113,8 +118,7 @@ class BlockCipherCBC(BlockCipher):
 
 
 @ciphers.BlockCipherCFB.register
-@StreamCipher.register
-class BlockCipherCFB(BlockCipher):
+class BlockCipherCFB(BlockCipherWithMode):
     """Abstract base class for block cipher in CFB mode."""
 
     mode_name = 'CFB'
@@ -125,8 +129,7 @@ class BlockCipherCFB(BlockCipher):
 
 
 @ciphers.BlockCipherOFB.register
-@StreamCipher.register
-class BlockCipherOFB(BlockCipher):
+class BlockCipherOFB(BlockCipherWithMode):
     """Abstract base class for block cipher in OFB mode."""
 
     mode_name = 'OFB'
@@ -137,8 +140,7 @@ class BlockCipherOFB(BlockCipher):
 
 
 @ciphers.BlockCipherCTR.register
-@StreamCipher.register
-class BlockCipherCTR(BlockCipher):
+class BlockCipherCTR(BlockCipherWithMode):
     """Abstract base class for block cipher in CTR mode."""
 
     mode_name = 'CTR'

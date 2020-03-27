@@ -29,24 +29,25 @@ class BlockCipher(Cipher):
     """Abstract base class for block cipher."""
 
 
-class BlockCipherECB(BlockCipher):
+class BlockCipherWithMode(BlockCipher):
+    """Abstract base class for block cipher with mode."""
+
+
+class BlockCipherECB(BlockCipherWithMode):
     """Abstract base class for block cipher in ECB mode."""
 
 
-class BlockCipherCBC(BlockCipher):
+class BlockCipherCBC(BlockCipherWithMode):
     """Abstract base class for block cipher in CBC mode."""
 
 
-@StreamCipher.register
-class BlockCipherCFB(BlockCipher):
+class BlockCipherCFB(BlockCipherWithMode):
     """Abstract base class for block cipher in CFB mode."""
 
 
-@StreamCipher.register
-class BlockCipherOFB(BlockCipher):
+class BlockCipherOFB(BlockCipherWithMode):
     """Abstract base class for block cipher in OFB mode."""
 
 
-@StreamCipher.register
-class BlockCipherCTR(BlockCipher):
+class BlockCipherCTR(BlockCipherWithMode):
     """Abstract base class for block cipher in CTR mode."""
