@@ -14,6 +14,11 @@ class Cipher(metaclass=abc.ABCMeta):
     def _algorithm(self):
         """The algorithm of cipher."""
 
+    @property
+    @abc.abstractmethod
+    def name(self):
+        """The name of cipher."""
+
     @abc.abstractmethod
     def encryptor(self):
         """Return the encryptor context."""
@@ -78,7 +83,7 @@ class BlockCipher(Cipher):
         return _utils._determine_decryptor(self._cipher, self._padding)
 
 
-@ciphers.BlockCipherWithMode
+@ciphers.BlockCipherWithMode.register
 class BlockCipherWithMode(BlockCipher):
     """Abstract base class for block cipher with mode."""
 
