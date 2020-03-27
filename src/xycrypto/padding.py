@@ -106,11 +106,12 @@ class _UnpadderFramework(Unpadder):
         self._buffer = b''
 
     def update(self, data):
+        if not data:    # no effect for empty data
+            return b''
+
         block_size = self.block_size
-        if len(data) < block_size or (len(data) % block_size) != 0:
-            raise ValueError(
-                'require len(data) >= {0} and (len(data) % {0}) == 0'.format(block_size)
-            )
+        if len(data) % block_size != 0:
+            raise ValueError('require len(data) % {0} == 0'.format(block_size))
 
         result = self._buffer
         self._buffer = data
