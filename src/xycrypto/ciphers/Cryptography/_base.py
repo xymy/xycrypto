@@ -14,18 +14,6 @@ class Cipher(metaclass=abc.ABCMeta):
     def _algorithm(self):
         """The algorithm of cipher."""
 
-    @property
-    def key_size(self):
-        """The key size in bytes of cipher."""
-
-        return self._cipher.algorithm.key_size // 8
-
-    @abc.abstractmethod
-    def __init__(self, algorithm, mode):
-        """Prepare the cipher context."""
-
-        self._cipher = _lib.Cipher(algorithm, mode, _lib.backend)
-
     @abc.abstractmethod
     def encryptor(self):
         """Return the encryptor context."""
