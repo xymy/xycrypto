@@ -16,15 +16,19 @@ _MODE_TABLE = {
 def _lookup_mode(mode):
     if inspect.isclass(mode) and issubclass(mode, _lib.Mode):
         return mode
+
     if isinstance(mode, str):
         try:
             return _MODE_TABLE[mode.upper()]
         except KeyError:
             pass
-    raise ValueError('mode must be in {}'.format(set(_MODE_TABLE)))
+
+    raise ValueError(
+        'mode must be in {}, got {}'.format(set(_MODE_TABLE), mode)
+    )
 
 
-def _setup_mode_padding(mode, **kwargs):
+def _create_mode(mode, **kwargs):
     mode = _lookup_mode(mode)
 
     args = {}
@@ -39,6 +43,12 @@ def _setup_mode_padding(mode, **kwargs):
         except KeyError:
             raise TypeError('missing required keyword-only argument: "nonce"')
 
+    return mode(**args)
+
+
+def _setup_mode_padding(mode, **kwargs):
+    mode = _create_mode(mode, **kwargs)
+
     # For ECB and CBC modes, the default padding is PKCS7.
     # For other modes, padding will not be added automatically.
     # However, user can force padding by providing the padding argument.
@@ -47,7 +57,7 @@ def _setup_mode_padding(mode, **kwargs):
     else:
         padding = kwargs.pop('padding', None)
 
-    return mode(**args), padding
+    return mode, padding
 
 
 def _determine_padding(padding, block_size):
