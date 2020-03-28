@@ -1,10 +1,8 @@
-from ._stream import (                  # NOQA; isort:skip
+from ._core_stream import (             # NOQA; isort:skip
     ChaCha20, RC4
 )
-from ._block_AES import (               # NOQA; isort:skip
-    AES, AES_ECB, AES_CBC, AES_CFB, AES_OFB, AES_CTR
-)
-from ._block_TripleDES import (         # NOQA; isort:skip
+from ._core_block import (              # NOQA; isort:skip
+    AES, AES_ECB, AES_CBC, AES_CFB, AES_OFB, AES_CTR,
     TripleDES, TripleDES_ECB, TripleDES_CBC, TripleDES_CFB, TripleDES_OFB
 )
 
