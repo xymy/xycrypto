@@ -1,8 +1,8 @@
 import abc
 
-from xycrypto.ciphers import base
+from xycrypto.ciphers import base, utils
 
-from . import _lib, _utils
+from . import _lib
 
 
 @base.Cipher.register
@@ -72,15 +72,24 @@ class BlockCipher(Cipher):
         return self._cipher.mode.name
 
     def __init__(self, key, mode, **kwargs):
-        mode, padding = _utils._setup_mode_padding(mode, **kwargs)
+        mode = _lib.create_mode(mode, **kwargs)
+
+        # For ECB and CBC modes, the default padding is PKCS7.
+        # For other modes, padding will not be added automatically.
+        # However, user can force padding by providing the padding argument.
+        if mode.name in {'ECB', 'CBC'}:
+            padding = kwargs.pop('padding', 'PKCS7')
+        else:
+            padding = kwargs.pop('padding', None)
+
         self._cipher = _lib.Cipher(self._algorithm(key), mode, _lib.backend)
-        self._padding = _utils._determine_padding(padding, self.block_size)
+        self._padding = utils.determine_padding(padding, self.block_size)
 
     def encryptor(self):
-        return _utils._determine_encryptor(self._cipher, self._padding)
+        return utils.determine_encryptor(self._cipher, self._padding)
 
     def decryptor(self):
-        return _utils._determine_decryptor(self._cipher, self._padding)
+        return utils.determine_decryptor(self._cipher, self._padding)
 
 
 @base.BlockCipherWithMode.register
@@ -96,7 +105,7 @@ class BlockCipherECB(BlockCipherWithMode):
 
     def __init__(self, key, *, padding='PKCS7'):
         self._cipher = _lib.Cipher(self._algorithm(key), _lib.ECB(), _lib.backend)
-        self._padding = _utils._determine_padding(padding, self.block_size)
+        self._padding = utils.determine_padding(padding, self.block_size)
 
 
 @base.BlockCipherCBC.register
@@ -107,7 +116,7 @@ class BlockCipherCBC(BlockCipherWithMode):
 
     def __init__(self, key, *, iv, padding='PKCS7'):
         self._cipher = _lib.Cipher(self._algorithm(key), _lib.CBC(iv), _lib.backend)
-        self._padding = _utils._determine_padding(padding, self.block_size)
+        self._padding = utils.determine_padding(padding, self.block_size)
 
 
 @base.BlockCipherCFB.register
@@ -118,7 +127,7 @@ class BlockCipherCFB(BlockCipherWithMode):
 
     def __init__(self, key, *, iv, padding=None):
         self._cipher = _lib.Cipher(self._algorithm(key), _lib.CFB(iv), _lib.backend)
-        self._padding = _utils._determine_padding(padding, self.block_size)
+        self._padding = utils.determine_padding(padding, self.block_size)
 
 
 @base.BlockCipherOFB.register
@@ -129,7 +138,7 @@ class BlockCipherOFB(BlockCipherWithMode):
 
     def __init__(self, key, *, iv, padding=None):
         self._cipher = _lib.Cipher(self._algorithm(key), _lib.OFB(iv), _lib.backend)
-        self._padding = _utils._determine_padding(padding, self.block_size)
+        self._padding = utils.determine_padding(padding, self.block_size)
 
 
 @base.BlockCipherCTR.register
@@ -140,4 +149,4 @@ class BlockCipherCTR(BlockCipherWithMode):
 
     def __init__(self, key, *, nonce, padding=None):
         self._cipher = _lib.Cipher(self._algorithm(key), _lib.CTR(nonce), _lib.backend)
-        self._padding = _utils._determine_padding(padding, self.block_size)
+        self._padding = utils.determine_padding(padding, self.block_size)

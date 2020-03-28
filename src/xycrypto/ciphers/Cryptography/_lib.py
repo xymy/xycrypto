@@ -1,3 +1,5 @@
+import inspect
+
 from cryptography.hazmat.backends import default_backend                # NOQA; isort:skip
 from cryptography.hazmat.primitives.ciphers import Cipher               # NOQA; isort:skip
 from cryptography.hazmat.primitives.ciphers.algorithms import (         # NOQA; isort:skip
@@ -10,3 +12,44 @@ from cryptography.hazmat.primitives.ciphers.modes import (              # NOQA; 
 )
 
 backend = default_backend()
+
+_MODE_TABLE = {
+    'ECB': ECB,
+    'CBC': CBC,
+    'CFB': CFB,
+    'OFB': OFB,
+    'CTR': CTR
+}
+
+
+def lookup_mode(mode):
+    if inspect.isclass(mode) and issubclass(mode, Mode):
+        return mode
+
+    if isinstance(mode, str):
+        try:
+            return _MODE_TABLE[mode.upper()]
+        except KeyError:
+            pass
+
+    raise ValueError(
+        'mode must be in {}, got {}'.format(set(_MODE_TABLE), mode)
+    )
+
+
+def create_mode(mode, **kwargs):
+    mode = lookup_mode(mode)
+
+    args = {}
+    if issubclass(mode, ModeWithInitializationVector):
+        try:
+            args['initialization_vector'] = kwargs['iv']
+        except KeyError:
+            raise TypeError('missing required keyword-only argument: "iv"')
+    if issubclass(mode, ModeWithNonce):
+        try:
+            args['nonce'] = kwargs['nonce']
+        except KeyError:
+            raise TypeError('missing required keyword-only argument: "nonce"')
+
+    return mode(**args)
