@@ -1,34 +1,32 @@
-from . import _base, _lib, _utils
-
-_AES_ATTRS = {
-    '_algorithm': _lib.AES,
-    'name': 'AES',
-    'block_size': 16,
-    'key_sizes': frozenset([16, 24, 32])
-}
-
-_X = _utils._make_X(_AES_ATTRS)
+from . import _base, _lib
 
 
-class AES(_X(_base.BlockCipher)):
+class _AES(_base.BlockCipher):
+    _algorithm = _lib.AES
+    name = 'AES'
+    block_size = 16
+    key_sizes = frozenset([16, 24, 32])
+
+
+class AES(_AES):
     pass
 
 
-class AES_ECB(_X(_base.BlockCipherECB)):
+class AES_ECB(_base.BlockCipherECB, _AES):
     pass
 
 
-class AES_CBC(_X(_base.BlockCipherCBC)):
+class AES_CBC(_base.BlockCipherCBC, _AES):
     pass
 
 
-class AES_CFB(_X(_base.BlockCipherCFB)):
+class AES_CFB(_base.BlockCipherCFB, _AES):
     pass
 
 
-class AES_OFB(_X(_base.BlockCipherOFB)):
+class AES_OFB(_base.BlockCipherOFB, _AES):
     pass
 
 
-class AES_CTR(_X(_base.BlockCipherCTR)):
+class AES_CTR(_base.BlockCipherCTR, _AES):
     pass
