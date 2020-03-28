@@ -123,7 +123,7 @@ class _UnpadderFramework(Unpadder):
             raise ValueError('incomplete padding')
 
         padded_size = self._buffer[-1]
-        if padded_size > block_size:
+        if padded_size == 0 or padded_size > block_size:
             raise ValueError('invalid padding')
         self._check(self._buffer, padded_size)
         return self._buffer[:-padded_size]
