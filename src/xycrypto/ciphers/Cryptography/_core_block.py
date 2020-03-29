@@ -35,6 +35,70 @@ class AES_CTR(_base.BlockCipherCTR, _AES):
     pass
 
 
+# Blowfish
+
+
+class _Blowfish(_base.BlockCipher):
+    _algorithm = _lib.Blowfish
+    name = 'Blowfish'
+    block_size = 8
+    key_sizes = frozenset(range(4, 57))
+
+
+class Blowfish(_Blowfish):
+    pass
+
+
+class Blowfish_ECB(_base.BlockCipherECB, _Blowfish):
+    pass
+
+
+class Blowfish_CBC(_base.BlockCipherCBC, _Blowfish):
+    pass
+
+
+class Blowfish_CFB(_base.BlockCipherCFB, _Blowfish):
+    pass
+
+
+class Blowfish_OFB(_base.BlockCipherOFB, _Blowfish):
+    pass
+
+
+# Camellia
+
+
+class _Camellia(_base.BlockCipher):
+    _algorithm = _lib.Camellia
+    name = 'Camellia'
+    block_size = 16
+    key_sizes = frozenset([16, 24, 32])
+
+
+class Camellia(_Camellia):
+    pass
+
+
+class Camellia_ECB(_base.BlockCipherECB, _Camellia):
+    pass
+
+
+class Camellia_CBC(_base.BlockCipherCBC, _Camellia):
+    pass
+
+
+class Camellia_CFB(_base.BlockCipherCFB, _Camellia):
+    pass
+
+
+class Camellia_OFB(_base.BlockCipherOFB, _Camellia):
+    pass
+
+
+class Camellia_CTR(_base.BlockCipherCTR, _Camellia):
+    pass
+
+
 # 3DES
 
 
