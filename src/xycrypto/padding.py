@@ -259,7 +259,7 @@ class ISO10126Unpadder(_UnpadderFramework):
 # ============================================================================ #
 
 
-_PADDING_TABLE = {
+_PADDING_REGISTRY = {
     'DUMMY': DUMMY,
     'PKCS7': PKCS7,
     'ANSIX923': ANSIX923,
@@ -271,29 +271,29 @@ _PADDING_TABLE = {
 }
 
 
-def _lookup_padding(padding):
+def lookup_padding(padding):
     if inspect.isclass(padding) and issubclass(padding, Padding):
         return padding
 
     if isinstance(padding, str):
         try:
-            return _PADDING_TABLE[padding.upper()]
+            return _PADDING_REGISTRY[padding.upper()]
         except KeyError:
             pass
 
     raise ValueError(
-        'padding must be in {}, got {}'.format(set(_PADDING_TABLE), padding)
+        'padding must be in {}, got {}'.format(set(_PADDING_REGISTRY), padding)
     )
 
 
-def _create_padding(padding, block_size):
-    padding = _lookup_padding(padding)
+def create_padding(padding, block_size):
+    padding = lookup_padding(padding)
     return padding(block_size)
 
 
-def _register_padding(padding_name, padding_class):
-    _PADDING_TABLE[padding_name.upper()] = padding_class
+def register_padding(padding_name, padding_class):
+    _PADDING_REGISTRY[padding_name.upper()] = padding_class
 
 
-def _unregister_padding(padding_name):
-    del _PADDING_TABLE[padding_name.upper()]
+def unregister_padding(padding_name):
+    del _PADDING_REGISTRY[padding_name.upper()]

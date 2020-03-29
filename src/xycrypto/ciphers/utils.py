@@ -1,10 +1,10 @@
-from xycrypto.padding import _create_padding
+from xycrypto.padding import create_padding
 
 
 def determine_padding(padding, block_size):
     if padding is None:
         return None
-    return _create_padding(padding, block_size)
+    return create_padding(padding, block_size)
 
 
 class PaddingWrapper(object):
