@@ -19,6 +19,13 @@ class Cipher(metaclass=abc.ABCMeta):
     def name(self):
         """The name of cipher."""
 
+    @property
+    def key_size(self):
+        """The key size in bytes of cipher."""
+
+        # pylint: disable=no-member
+        return self._cipher.algorithm.key_size // 8
+
     @abc.abstractmethod
     def encryptor(self):
         """Return the encryptor context."""
