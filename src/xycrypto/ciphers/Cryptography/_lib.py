@@ -13,7 +13,7 @@ from cryptography.hazmat.primitives.ciphers.modes import (              # NOQA; 
 
 backend = default_backend()
 
-_MODE_TABLE = {
+_MODE_REGISTRY = {
     'ECB': ECB,
     'CBC': CBC,
     'CFB': CFB,
@@ -28,12 +28,12 @@ def lookup_mode(mode):
 
     if isinstance(mode, str):
         try:
-            return _MODE_TABLE[mode.upper()]
+            return _MODE_REGISTRY[mode.upper()]
         except KeyError:
             pass
 
     raise ValueError(
-        'mode must be in {}, got {}'.format(set(_MODE_TABLE), mode)
+        'mode must be in {}, got {}'.format(set(_MODE_REGISTRY), mode)
     )
 
 
