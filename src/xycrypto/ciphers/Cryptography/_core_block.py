@@ -99,6 +99,36 @@ class Camellia_CTR(_base.BlockCipherCTR, _Camellia):
     pass
 
 
+# SEED
+
+
+class _SEED(_base.BlockCipher):
+    _algorithm = _lib.SEED
+    name = 'SEED'
+    block_size = 16
+    key_sizes = frozenset([16])
+
+
+class SEED(_SEED):
+    pass
+
+
+class SEED_ECB(_base.BlockCipherECB, _SEED):
+    pass
+
+
+class SEED_CBC(_base.BlockCipherCBC, _SEED):
+    pass
+
+
+class SEED_CFB(_base.BlockCipherCFB, _SEED):
+    pass
+
+
+class SEED_OFB(_base.BlockCipherOFB, _SEED):
+    pass
+
+
 # 3DES
 
 
