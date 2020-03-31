@@ -7,6 +7,8 @@ from xycrypto import __version__, __author__
 readme = Path(__file__).with_name('README.md').read_text()
 
 classifiers = [
+    'License :: OSI Approved',
+    'License :: OSI Approved :: MIT License',
     'Operating System :: OS Independent',
     'Programming Language :: Python',
     'Programming Language :: Python :: 3',
