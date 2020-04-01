@@ -99,6 +99,36 @@ class Camellia_CTR(_base.BlockCipherCTR, _Camellia):
     pass
 
 
+# CAST5
+
+
+class _CAST5(_base.BlockCipher):
+    _algorithm = _lib.CAST5
+    name = 'CAST5'
+    block_size = 8
+    key_sizes = frozenset(range(5, 16))
+
+
+class CAST5(_CAST5):
+    pass
+
+
+class CAST5_ECB(_base.BlockCipherECB, _CAST5):
+    pass
+
+
+class CAST5_CBC(_base.BlockCipherCBC, _CAST5):
+    pass
+
+
+class CAST5_CFB(_base.BlockCipherCFB, _CAST5):
+    pass
+
+
+class CAST5_OFB(_base.BlockCipherOFB, _CAST5):
+    pass
+
+
 # SEED
 
 
