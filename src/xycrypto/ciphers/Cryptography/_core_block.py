@@ -129,6 +129,36 @@ class CAST5_OFB(_base.BlockCipherOFB, _CAST5):
     pass
 
 
+# IDEA
+
+
+class _IDEA(_base.BlockCipher):
+    _algorithm = _lib.IDEA
+    name = 'IDEA'
+    block_size = 8
+    key_sizes = frozenset([16])
+
+
+class IDEA(_IDEA):
+    pass
+
+
+class IDEA_ECB(_base.BlockCipherECB, _IDEA):
+    pass
+
+
+class IDEA_CBC(_base.BlockCipherCBC, _IDEA):
+    pass
+
+
+class IDEA_CFB(_base.BlockCipherCFB, _IDEA):
+    pass
+
+
+class IDEA_OFB(_base.BlockCipherOFB, _IDEA):
+    pass
+
+
 # SEED
 
 
