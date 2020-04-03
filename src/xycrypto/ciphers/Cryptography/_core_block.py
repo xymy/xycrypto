@@ -106,7 +106,7 @@ class _CAST5(_base.BlockCipher):
     _algorithm = _lib.CAST5
     name = 'CAST5'
     block_size = 8
-    key_sizes = frozenset(range(5, 16))
+    key_sizes = frozenset(range(5, 17))
 
 
 class CAST5(_CAST5):
