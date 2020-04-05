@@ -2,6 +2,8 @@
 
 ## Installation
 
+Require Python 3.6+.
+
 ```shell
 pip install -U xycrypto
 ```
@@ -12,7 +14,7 @@ The `xycrypto` provides simple and elegant interfaces for ciphers.
 
 The cryptography components for ciphers we support:
 - Available *stream cipher*: `ChaCha20`, `RC4`.
-- Available *block cipher*: `AES`, `DES`, `TripleDES`.
+- Available *block cipher*: `AES`, `Blowfish`, `Camellia`, `CAST5`, `DES`, `IDEA`, `SEED`, `TripleDES`.
 - Available *mode*: `ECB`, `CBC`, `CFB`, `OFB`, `CTR`.
 - Available *padding*: `PKCS7`, `ANSIX923`, `ISO10126`.
 
