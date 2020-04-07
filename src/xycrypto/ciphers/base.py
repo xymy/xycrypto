@@ -29,25 +29,21 @@ class BlockCipher(Cipher):
     """Abstract base class for block cipher."""
 
 
-class BlockCipherWithMode(BlockCipher):
-    """Abstract base class for block cipher with mode."""
-
-
-class BlockCipherECB(BlockCipherWithMode):
+class BlockCipherECB(BlockCipher):
     """Abstract base class for block cipher in ECB mode."""
 
 
-class BlockCipherCBC(BlockCipherWithMode):
+class BlockCipherCBC(BlockCipher):
     """Abstract base class for block cipher in CBC mode."""
 
 
-class BlockCipherCFB(BlockCipherWithMode):
+class BlockCipherCFB(BlockCipher):
     """Abstract base class for block cipher in CFB mode."""
 
 
-class BlockCipherOFB(BlockCipherWithMode):
+class BlockCipherOFB(BlockCipher):
     """Abstract base class for block cipher in OFB mode."""
 
 
-class BlockCipherCTR(BlockCipherWithMode):
+class BlockCipherCTR(BlockCipher):
     """Abstract base class for block cipher in CTR mode."""
