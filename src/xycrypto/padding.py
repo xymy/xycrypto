@@ -111,7 +111,8 @@ class _UnpadderFramework(Unpadder):
 
         block_size = self.block_size
         if len(data) % block_size != 0:
-            raise ValueError('require len(data) % {0} == 0'.format(block_size))
+            # User must ensure `len(data) % block_size == 0` for performance.
+            raise ValueError('require len(data) % {} == 0'.format(block_size))
 
         result = self._buffer
         self._buffer = data
@@ -120,12 +121,15 @@ class _UnpadderFramework(Unpadder):
     def finalize(self):
         block_size = self.block_size
         if len(self._buffer) < block_size:
+            # This exception will be raised only when `block_size == 0`, since
+            # `update` method ensuring that `len(_buffer) % block_size == 0`.
             raise ValueError('incomplete padding')
 
         padded_size = self._buffer[-1]
         if padded_size == 0 or padded_size > block_size:
             raise ValueError('invalid padding')
         self._check(self._buffer, padded_size)
+
         return self._buffer[:-padded_size]
 
     @staticmethod
@@ -272,6 +276,8 @@ _PADDING_REGISTRY = {
 
 
 def lookup_padding(padding):
+    """Return the class object of given padding."""
+
     if inspect.isclass(padding) and issubclass(padding, Padding):
         return padding
 
@@ -287,13 +293,7 @@ def lookup_padding(padding):
 
 
 def create_padding(padding, block_size):
+    """Return the instance object of given padding."""
+
     padding = lookup_padding(padding)
     return padding(block_size)
-
-
-def register_padding(padding_name, padding_class):
-    _PADDING_REGISTRY[padding_name.upper()] = padding_class
-
-
-def unregister_padding(padding_name):
-    del _PADDING_REGISTRY[padding_name.upper()]
